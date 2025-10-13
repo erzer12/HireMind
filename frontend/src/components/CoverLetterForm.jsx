@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './CoverLetterForm.css';
+import { api } from '../services/api.js';
 
 function CoverLetterForm({ onGenerate, loading }) {
   const [formData, setFormData] = useState({
@@ -8,6 +9,9 @@ function CoverLetterForm({ onGenerate, loading }) {
       email: '',
       summary: '',
       skills: '',
+      linkedin: '',
+      github: '',
+      portfolio: '',
     },
     jobInfo: {
       position: '',
@@ -15,6 +19,21 @@ function CoverLetterForm({ onGenerate, loading }) {
       description: '',
     },
   });
+
+  const [parsedResumeData, setParsedResumeData] = useState(null);
+
+  useEffect(() => {
+    // Check if there's an uploaded resume in session
+    api.getSessionResume()
+      .then(response => {
+        if (response.success && response.data.hasResume) {
+          setParsedResumeData(response.data.resumeData);
+        }
+      })
+      .catch(err => {
+        console.error('Failed to check session resume:', err);
+      });
+  }, []);
 
   const handleUserInfoChange = (e) => {
     const { name, value } = e.target;
@@ -32,6 +51,24 @@ function CoverLetterForm({ onGenerate, loading }) {
     });
   };
 
+  const handleAutofillFromResume = () => {
+    if (parsedResumeData) {
+      setFormData({
+        ...formData,
+        userInfo: {
+          ...formData.userInfo,
+          name: parsedResumeData.name || formData.userInfo.name,
+          email: parsedResumeData.email || formData.userInfo.email,
+          summary: parsedResumeData.summary || formData.userInfo.summary,
+          skills: parsedResumeData.skills ? parsedResumeData.skills.join(', ') : formData.userInfo.skills,
+        }
+      });
+      alert('✅ Form populated with resume data!');
+    } else {
+      alert('No resume data available. Please upload a resume in the Resume section first.');
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const dataToSend = {
@@ -47,6 +84,17 @@ function CoverLetterForm({ onGenerate, loading }) {
   return (
     <form className="cover-letter-form" onSubmit={handleSubmit}>
       <h2>Your Information</h2>
+      {parsedResumeData && (
+        <div className="autofill-section">
+          <button
+            type="button"
+            onClick={handleAutofillFromResume}
+            className="autofill-button"
+          >
+            ⚡ Autofill from Uploaded Resume
+          </button>
+        </div>
+      )}
       <div className="form-group">
         <label>Name *</label>
         <input
@@ -88,6 +136,40 @@ function CoverLetterForm({ onGenerate, loading }) {
           value={formData.userInfo.skills}
           onChange={handleUserInfoChange}
           placeholder="JavaScript, React, Node.js, etc."
+        />
+      </div>
+
+      <h2>Profile Links</h2>
+      <div className="form-group">
+        <label>LinkedIn Profile</label>
+        <input
+          type="url"
+          name="linkedin"
+          value={formData.userInfo.linkedin}
+          onChange={handleUserInfoChange}
+          placeholder="https://linkedin.com/in/yourprofile"
+        />
+      </div>
+
+      <div className="form-group">
+        <label>GitHub Profile</label>
+        <input
+          type="url"
+          name="github"
+          value={formData.userInfo.github}
+          onChange={handleUserInfoChange}
+          placeholder="https://github.com/yourusername"
+        />
+      </div>
+
+      <div className="form-group">
+        <label>Portfolio Website</label>
+        <input
+          type="url"
+          name="portfolio"
+          value={formData.userInfo.portfolio}
+          onChange={handleUserInfoChange}
+          placeholder="https://yourportfolio.com"
         />
       </div>
 

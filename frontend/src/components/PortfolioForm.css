@@ -194,3 +194,37 @@
     padding: 16px 30px;
   }
 }
+
+/* Autofill Section Styles */
+.autofill-section {
+  background: linear-gradient(135deg, #e8f4fd 0%, #ffffff 100%);
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  border: 2px dashed #2196F3;
+  text-align: center;
+}
+
+.autofill-button {
+  background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+}
+
+.autofill-button:hover {
+  background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+}
+
+.autofill-button:active {
+  transform: translateY(0);
+}
+

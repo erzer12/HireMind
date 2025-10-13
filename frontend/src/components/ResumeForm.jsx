@@ -11,6 +11,9 @@ function ResumeForm({ onGenerate, loading }) {
     location: '',
     summary: '',
     skills: '',
+    linkedin: '',
+    github: '',
+    portfolio: '',
     experience: [{ position: '', company: '', duration: '', description: '' }],
     education: [{ degree: '', institution: '', year: '' }],
     template: 'modern',
@@ -31,6 +34,8 @@ function ResumeForm({ onGenerate, loading }) {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [hasUploadedResume, setHasUploadedResume] = useState(false);
   const [uploadedResumeInfo, setUploadedResumeInfo] = useState(null);
+  const [selectedSkills, setSelectedSkills] = useState(new Set());
+  const [parsedResumeData, setParsedResumeData] = useState(null);
   
   useEffect(() => {
     // Fetch available templates
@@ -88,6 +93,74 @@ function ResumeForm({ onGenerate, loading }) {
     });
   };
 
+  // Helper function to populate form from parsed resume data
+  const populateFormFromParsedResume = (data) => {
+    setFormData({
+      ...formData,
+      name: data.name || formData.name,
+      email: data.email || formData.email,
+      phone: data.phone || formData.phone,
+      location: data.location || formData.location,
+      summary: data.summary || formData.summary,
+      skills: data.skills ? data.skills.join(', ') : formData.skills,
+      experience: data.experience && data.experience.length > 0 ? data.experience : formData.experience,
+      education: data.education && data.education.length > 0 ? data.education : formData.education,
+    });
+  };
+
+  // Autofill from uploaded resume
+  const handleAutofillFromResume = () => {
+    if (parsedResumeData) {
+      populateFormFromParsedResume(parsedResumeData);
+      alert('✅ Form populated with resume data!');
+    } else {
+      alert('No resume data available. Please upload a resume first.');
+    }
+  };
+
+  // Toggle skill selection
+  const handleSkillToggle = (skill) => {
+    const newSelected = new Set(selectedSkills);
+    if (newSelected.has(skill)) {
+      newSelected.delete(skill);
+    } else {
+      newSelected.add(skill);
+    }
+    setSelectedSkills(newSelected);
+  };
+
+  // Apply selected skills to form
+  const handleApplySelectedSkills = () => {
+    if (selectedSkills.size === 0) {
+      alert('Please select at least one skill to add.');
+      return;
+    }
+    
+    // Get current skills as array
+    const currentSkills = formData.skills
+      .split(',')
+      .map(s => s.trim())
+      .filter(s => s);
+    
+    // Add selected skills (avoid duplicates)
+    const newSkills = [...currentSkills];
+    selectedSkills.forEach(skill => {
+      if (!newSkills.some(s => s.toLowerCase() === skill.toLowerCase())) {
+        newSkills.push(skill);
+      }
+    });
+    
+    // Update form
+    setFormData({
+      ...formData,
+      skills: newSkills.join(', ')
+    });
+    
+    // Clear selection
+    setSelectedSkills(new Set());
+    alert(`✅ Added ${selectedSkills.size} skill(s) to your resume!`);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const dataToSend = {
@@ -116,6 +189,7 @@ function ResumeForm({ onGenerate, loading }) {
         const data = response.data;
         setHasUploadedResume(true);
         setUploadedResumeInfo(data);
+        setParsedResumeData(data); // Store parsed data for autofill
         
         // Optionally populate form fields with parsed data
         if (data.name || data.email || data.skills) {
@@ -126,17 +200,7 @@ function ResumeForm({ onGenerate, loading }) {
           );
           
           if (shouldPopulate) {
-            setFormData({
-              ...formData,
-              name: data.name || formData.name,
-              email: data.email || formData.email,
-              phone: data.phone || formData.phone,
-              location: data.location || formData.location,
-              summary: data.summary || formData.summary,
-              skills: data.skills ? data.skills.join(', ') : formData.skills,
-              experience: data.experience && data.experience.length > 0 ? data.experience : formData.experience,
-              education: data.education && data.education.length > 0 ? data.education : formData.education,
-            });
+            populateFormFromParsedResume(data);
           }
         }
         
@@ -146,6 +210,7 @@ function ResumeForm({ onGenerate, loading }) {
       alert('Failed to upload resume: ' + error.message);
       setHasUploadedResume(false);
       setUploadedResumeInfo(null);
+      setParsedResumeData(null);
     } finally {
       setUploadingResume(false);
     }
@@ -397,9 +462,17 @@ function ResumeForm({ onGenerate, loading }) {
               {suggestions.missingSkills && suggestions.missingSkills.length > 0 && (
                 <div className="suggestion-item">
                   <strong>⚠️ Missing Skills:</strong>
-                  <div className="skill-tags">
+                  <div className="skill-tags-interactive">
                     {suggestions.missingSkills.map((skill, idx) => (
-                      <span key={idx} className="skill-tag missing">{skill}</span>
+                      <label key={idx} className="skill-checkbox-label">
+                        <input
+                          type="checkbox"
+                          checked={selectedSkills.has(skill)}
+                          onChange={() => handleSkillToggle(skill)}
+                          className="skill-checkbox"
+                        />
+                        <span className="skill-tag missing">{skill}</span>
+                      </label>
                     ))}
                   </div>
                 </div>
@@ -408,11 +481,32 @@ function ResumeForm({ onGenerate, loading }) {
               {suggestions.suggestedSkills && suggestions.suggestedSkills.length > 0 && (
                 <div className="suggestion-item">
                   <strong>✨ Suggested Skills to Add:</strong>
-                  <div className="skill-tags">
+                  <div className="skill-tags-interactive">
                     {suggestions.suggestedSkills.map((skill, idx) => (
-                      <span key={idx} className="skill-tag suggested">{skill}</span>
+                      <label key={idx} className="skill-checkbox-label">
+                        <input
+                          type="checkbox"
+                          checked={selectedSkills.has(skill)}
+                          onChange={() => handleSkillToggle(skill)}
+                          className="skill-checkbox"
+                        />
+                        <span className="skill-tag suggested">{skill}</span>
+                      </label>
                     ))}
                   </div>
+                </div>
+              )}
+
+              {(suggestions.missingSkills?.length > 0 || suggestions.suggestedSkills?.length > 0) && (
+                <div className="skill-actions">
+                  <button
+                    type="button"
+                    onClick={handleApplySelectedSkills}
+                    className="apply-skills-button"
+                    disabled={selectedSkills.size === 0}
+                  >
+                    ✅ Apply Selected Skills ({selectedSkills.size})
+                  </button>
                 </div>
               )}
 
@@ -446,6 +540,17 @@ function ResumeForm({ onGenerate, loading }) {
       )}
       
       <h2>Personal Information</h2>
+      {hasUploadedResume && parsedResumeData && (
+        <div className="autofill-section">
+          <button
+            type="button"
+            onClick={handleAutofillFromResume}
+            className="autofill-button"
+          >
+            ⚡ Autofill from Uploaded Resume
+          </button>
+        </div>
+      )}
       <div className="form-group">
         <label>Name *</label>
         <input
@@ -507,6 +612,40 @@ function ResumeForm({ onGenerate, loading }) {
           value={formData.skills}
           onChange={handleInputChange}
           placeholder="JavaScript, React, Node.js, etc."
+        />
+      </div>
+
+      <h2>Profile Links</h2>
+      <div className="form-group">
+        <label>LinkedIn Profile</label>
+        <input
+          type="url"
+          name="linkedin"
+          value={formData.linkedin}
+          onChange={handleInputChange}
+          placeholder="https://linkedin.com/in/yourprofile"
+        />
+      </div>
+
+      <div className="form-group">
+        <label>GitHub Profile</label>
+        <input
+          type="url"
+          name="github"
+          value={formData.github}
+          onChange={handleInputChange}
+          placeholder="https://github.com/yourusername"
+        />
+      </div>
+
+      <div className="form-group">
+        <label>Portfolio Website</label>
+        <input
+          type="url"
+          name="portfolio"
+          value={formData.portfolio}
+          onChange={handleInputChange}
+          placeholder="https://yourportfolio.com"
         />
       </div>
 
