@@ -72,6 +72,14 @@ AI_PROVIDER_PRIORITY=openai
 
 ## Error Handling
 
+### JSON Parsing Errors
+
+AI providers (especially Gemini) may return malformed JSON responses. HireMind implements robust JSON repair and logging to handle these cases automatically. See [JSON_ERROR_HANDLING.md](./JSON_ERROR_HANDLING.md) for detailed information about:
+
+- Automatic JSON repair for common syntax errors (trailing commas, missing commas, etc.)
+- Comprehensive logging of raw responses when parsing fails
+- Best practices for handling JSON responses from LLMs
+
 ### Retryable Errors
 
 These errors trigger automatic fallback to the next provider:
