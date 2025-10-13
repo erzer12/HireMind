@@ -12,16 +12,22 @@ function App() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
-  const handleGenerateResume = async (userInfo) => {
+  const handleGenerateResume = async (userInfo, isTailored = false) => {
     setLoading(true);
     setError(null);
     setResult(null);
     try {
-      const response = await api.generateResume(userInfo, userInfo.template);
+      let response;
+      if (isTailored && userInfo.jobDescription) {
+        response = await api.generateTailoredResume(userInfo, userInfo.jobDescription, userInfo.template);
+      } else {
+        response = await api.generateResume(userInfo, userInfo.template);
+      }
       setResult({ 
         type: 'resume', 
         content: response.data.resume,
-        format: response.data.format || 'markdown'
+        format: response.data.format || 'markdown',
+        tailoredSuggestions: response.data.tailoredSuggestions
       });
     } catch (err) {
       setError(err.message);

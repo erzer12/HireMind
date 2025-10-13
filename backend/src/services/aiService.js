@@ -131,3 +131,111 @@ Generate a modern, professional HTML portfolio page with inline CSS styling. Inc
   
   return await generateText(prompt, systemMessage);
 }
+
+/**
+ * Analyze job description and extract key information
+ * @param {string} jobDescription - The job description text
+ * @returns {Promise<Object>} Analyzed job information
+ */
+export async function analyzeJobDescription(jobDescription) {
+  const prompt = `Analyze the following job description and extract key information in JSON format:
+
+Job Description:
+${jobDescription}
+
+Please provide a JSON response with the following structure:
+{
+  "requiredSkills": ["skill1", "skill2", ...],
+  "preferredSkills": ["skill1", "skill2", ...],
+  "keywords": ["keyword1", "keyword2", ...],
+  "experienceLevel": "entry/mid/senior",
+  "responsibilities": ["responsibility1", "responsibility2", ...],
+  "qualifications": ["qualification1", "qualification2", ...]
+}
+
+Focus on technical skills, tools, and relevant keywords that should appear in a resume.`;
+
+  const systemMessage = 'You are an expert at analyzing job descriptions and extracting key requirements. Always respond with valid JSON only, no additional text.';
+  
+  const response = await generateText(prompt, systemMessage);
+  
+  try {
+    return JSON.parse(response);
+  } catch (error) {
+    console.error('Failed to parse JD analysis response:', error);
+    throw new ApiError(500, 'Failed to parse job description analysis');
+  }
+}
+
+/**
+ * Compare resume with job description and provide suggestions
+ * @param {Object} resumeData - Current resume data
+ * @param {string} jobDescription - Job description text
+ * @returns {Promise<Object>} Suggestions for improvement
+ */
+export async function compareResumeWithJD(resumeData, jobDescription) {
+  const prompt = `Compare the following resume with the job description and provide improvement suggestions:
+
+Resume:
+Name: ${resumeData.name}
+Skills: ${resumeData.skills?.join(', ') || 'None listed'}
+Experience: ${resumeData.experience?.map(e => `${e.position} at ${e.company}`).join(', ') || 'None listed'}
+Summary: ${resumeData.summary || 'No summary'}
+
+Job Description:
+${jobDescription}
+
+Provide a JSON response with:
+{
+  "matchScore": <number 0-100>,
+  "missingSkills": ["skill1", "skill2", ...],
+  "suggestedSkills": ["skill1", "skill2", ...],
+  "summaryImprovements": "Suggested improvements for professional summary",
+  "experienceImprovements": ["suggestion1", "suggestion2", ...],
+  "keywordsToAdd": ["keyword1", "keyword2", ...],
+  "strengths": ["strength1", "strength2", ...],
+  "overallFeedback": "Brief overall assessment"
+}`;
+
+  const systemMessage = 'You are an expert resume coach and ATS optimization specialist. Provide actionable, specific suggestions. Always respond with valid JSON only.';
+  
+  const response = await generateText(prompt, systemMessage);
+  
+  try {
+    return JSON.parse(response);
+  } catch (error) {
+    console.error('Failed to parse resume comparison response:', error);
+    throw new ApiError(500, 'Failed to analyze resume comparison');
+  }
+}
+
+/**
+ * Generate tailored resume content based on job description
+ * @param {Object} userInfo - User's resume information
+ * @param {string} jobDescription - Job description to tailor for
+ * @returns {Promise<string>} Tailored resume suggestions
+ */
+export async function generateTailoredResume(userInfo, jobDescription) {
+  const prompt = `Create an optimized resume tailored for the following job description:
+
+Job Description:
+${jobDescription}
+
+User's Information:
+Name: ${userInfo.name}
+Email: ${userInfo.email}
+Phone: ${userInfo.phone || 'Not provided'}
+Location: ${userInfo.location || 'Not provided'}
+Summary: ${userInfo.summary || 'Not provided'}
+Skills: ${userInfo.skills?.join(', ') || 'Not provided'}
+Experience: ${userInfo.experience?.map(exp => `${exp.position} at ${exp.company} (${exp.duration}): ${exp.description}`).join('\n') || 'Not provided'}
+Education: ${userInfo.education?.map(edu => `${edu.degree} from ${edu.institution} (${edu.year})`).join('\n') || 'Not provided'}
+
+Tailor the resume to highlight relevant skills and experience that match the job description. 
+Include keywords from the JD naturally throughout the resume.
+Provide the complete resume content in markdown format.`;
+
+  const systemMessage = 'You are an expert resume writer specializing in ATS optimization and job-specific tailoring. Create compelling, keyword-rich resumes.';
+  
+  return await generateText(prompt, systemMessage);
+}

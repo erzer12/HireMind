@@ -9,13 +9,21 @@
     "dev": "node --watch -r dotenv/config src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["resume", "portfolio", "ai", "openai"],
+  "keywords": [
+    "resume",
+    "portfolio",
+    "ai",
+    "openai"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
-    "openai": "^4.20.1"
+    "express": "^4.18.2",
+    "mammoth": "^1.11.0",
+    "multer": "^2.0.2",
+    "openai": "^4.20.1",
+    "pdf-parse": "^2.3.0"
   }
 }
