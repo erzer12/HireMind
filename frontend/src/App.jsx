@@ -116,6 +116,16 @@ function App() {
 
       <footer className="app-footer">
         <p>Powered by OpenAI | Built with React & Node.js</p>
+        <div className="footer-links">
+          <a href="https://github.com/erzer12/HireMind" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a href="https://github.com/erzer12/HireMind#readme" target="_blank" rel="noopener noreferrer">Documentation</a>
+          <a href="mailto:contact@hiremind.app">Contact</a>
+        </div>
+        <div className="footer-social">
+          <a href="https://github.com/erzer12/HireMind" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+            <span style={{ fontSize: '1.2em' }}>⭐</span>
+          </a>
+        </div>
       </footer>
     </div>
   );

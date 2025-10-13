@@ -10,7 +10,7 @@
     sans-serif;
   line-height: 1.6;
   font-weight: 400;
-  color: #213547;
+  color: #2c3e50;
   background-color: #ffffff;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -22,6 +22,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
 }
 
 #root {
@@ -30,14 +31,51 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   line-height: 1.2;
+  font-weight: 600;
 }
 
 a {
   color: #667eea;
   text-decoration: none;
+  transition: color 0.3s ease;
 }
 
 a:hover {
+  color: #764ba2;
   text-decoration: underline;
 }
+
+button {
+  font-family: inherit;
+}
+
+input, textarea, select {
+  font-family: inherit;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%);
+}
+
 
