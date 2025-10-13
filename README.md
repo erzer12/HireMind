@@ -61,14 +61,13 @@ HireMind/
 │   ├── package.json
 │   └── .env.example
 │
-├── README.md
-└── TEMPLATES.md           # Template documentation
+└── README.md
 ```
 
 ## Setup Instructions
 
 ### Prerequisites
-- Node.js (v18 or higher)
+- Node.js (v20 or higher)
 - npm or yarn
 - OpenAI API key ([Get one here](https://platform.openai.com/api-keys))
 
@@ -174,8 +173,6 @@ HireMind offers three professional resume templates:
 - **Classic ATS**: Traditional black and white layout optimized for Applicant Tracking Systems (ATS Score: 10/10) ⭐
 - **Minimal Sidebar**: Clean two-column design with dark sidebar (ATS Score: 8/10)
 
-See [TEMPLATES.md](./TEMPLATES.md) for detailed template documentation and instructions for adding new templates.
-
 ## Testing
 
 ### Running Tests
@@ -189,9 +186,7 @@ npm test
 
 ### Manual Testing
 
-For detailed manual testing of the resume upload and parsing feature, including step-by-step test scenarios and validation checklists, see the [Manual Test Guide](docs/testing/MANUAL_TEST_GUIDE.md).
-
-Sample test files:
+The application supports comprehensive manual testing of resume upload and parsing features. Sample test files are available in the `docs/samples/` directory:
 - [Sample Resume](docs/samples/sample_resume.txt) - Complete resume example
 - [Sample Job Description](docs/samples/sample_job_description.txt) - Job description for testing comparisons
 
@@ -623,8 +618,6 @@ The system automatically retries with the next provider for:
 ✅ Successfully generated text with Gemini
 ```
 
-**📖 For complete documentation on the AI fallback system**, including troubleshooting, testing, and adding new providers, see **[AI_FALLBACK.md](./AI_FALLBACK.md)**.
-
 ## Troubleshooting
 
 ### "No AI provider API keys configured"
@@ -731,21 +724,9 @@ This error indicates that the frontend cannot connect to the backend API server.
 - If port 3001 or 5173 is in use, change the port in `.env` files
 - Update the frontend `VITE_API_URL` if you change the backend port
 
-## Documentation
-
-For detailed information about specific features and systems:
-
-- **[AI_FALLBACK.md](./AI_FALLBACK.md)** - AI provider fallback system, configuration, and error handling
-- **[JSON_ERROR_HANDLING.md](./JSON_ERROR_HANDLING.md)** - Robust JSON parsing and error handling for AI responses
-- **[TEMPLATES.md](./TEMPLATES.md)** - Guide for creating and adding new resume templates
-
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
-
-### Adding New Templates
-
-See [TEMPLATES.md](./TEMPLATES.md) for detailed instructions on creating and adding new resume templates.
 
 ## License
 
@@ -773,13 +754,6 @@ You are free to:
 - ✅ Modify and customize the templates
 - ✅ Create derivative works
 - ✅ Distribute the templates
-
-See [TEMPLATES.md](./TEMPLATES.md) for full documentation on template usage and customization.
-
-## Additional Documentation
-
-- **[AI_FALLBACK.md](./AI_FALLBACK.md)** - Comprehensive guide to the AI provider fallback system, including configuration, troubleshooting, and best practices
-- **[TEMPLATES.md](./TEMPLATES.md)** - Complete documentation on resume templates, customization, and adding new templates
 
 ## Acknowledgments
 
