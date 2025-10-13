@@ -306,9 +306,64 @@ This warning appears when the `OPENAI_API_KEY` is not found in your environment 
 **Note:** The `.env.example` file is only a template and is NOT loaded by the application. You must create your own `.env` file.
 
 ### "Failed to fetch" errors
-- Ensure the backend server is running on port 3001
-- Check that CORS is properly configured
-- Verify the `VITE_API_URL` in frontend matches your backend URL
+
+This error indicates that the frontend cannot connect to the backend API server. Follow these steps to diagnose and fix:
+
+#### Quick Checklist
+- [ ] Is the backend server running? (Check terminal for "🚀 HireMind API server running")
+- [ ] Is the backend accessible at http://localhost:3001? (Open in browser - should see "HireMind API Running")
+- [ ] Is the frontend configured with the correct API URL?
+- [ ] Are both frontend and backend running on expected ports?
+
+#### Detailed Debugging Steps
+
+1. **Verify Backend is Running**
+   ```bash
+   # In one terminal window
+   cd backend
+   npm run dev
+   ```
+   You should see:
+   ```
+   🚀 HireMind API server running on port 3001
+   📍 Health check: http://localhost:3001/api/health
+   ```
+
+2. **Test Backend Connection**
+   - Open http://localhost:3001 in your browser
+   - You should see: "HireMind API Running"
+   - Try the health check: http://localhost:3001/api/health
+   - Should return: `{"status":"OK","message":"HireMind API is running"}`
+
+3. **Check Browser Network Tab**
+   - Open browser DevTools (F12)
+   - Go to Network tab
+   - Try using the application
+   - Look for failed requests (shown in red)
+   - Click on failed request to see:
+     - Request URL (should be http://localhost:3001/api/...)
+     - Error message (CORS, timeout, connection refused, etc.)
+
+4. **Verify Frontend API Configuration**
+   - Check `frontend/.env` file (if it exists)
+   - Ensure `VITE_API_URL=http://localhost:3001/api` (or leave unset to use default)
+   - If you changed the backend port, update this value
+   - **Important:** Restart the frontend dev server after changing `.env`
+
+5. **Common Causes and Solutions**
+   
+   | Error Message | Cause | Solution |
+   |---------------|-------|----------|
+   | `Failed to fetch` | Backend not running | Start backend with `npm run dev` |
+   | `net::ERR_CONNECTION_REFUSED` | Wrong port or backend crashed | Check backend terminal for errors |
+   | `CORS policy` | CORS misconfigured | CORS is pre-configured; restart backend |
+   | Wrong URL in requests | Frontend env mismatch | Verify `VITE_API_URL` in `.env` |
+
+#### Still Having Issues?
+- Ensure no firewall is blocking ports 3001 or 5173
+- Try a different port by setting `PORT=3002` in `backend/.env`
+- Clear browser cache and restart dev servers
+- Check for conflicting processes: `lsof -i :3001` (Mac/Linux) or `netstat -ano | findstr :3001` (Windows)
 
 ### Port conflicts
 - If port 3001 or 5173 is in use, change the port in `.env` files

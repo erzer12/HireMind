@@ -14,6 +14,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
+app.get('/', (req, res) => {
+  res.send('HireMind API Running');
+});
+
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'HireMind API is running' });
 });
