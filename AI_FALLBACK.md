@@ -135,12 +135,17 @@ The system provides detailed logging for monitoring and debugging:
 3. Click "Create API key"
 4. Copy the key and add to `.env` as `GEMINI_API_KEY`
 
-### Free Tier Limits
+### Free Tier and Pricing
 
-| Provider | Free Tier | Rate Limits |
-|----------|-----------|-------------|
-| OpenAI | Limited trial credits | Varies by model |
-| Gemini | 15 requests/minute | 1,500 requests/day |
+| Provider | Pricing Model | Rate Limits |
+|----------|---------------|-------------|
+| OpenAI | Pay-per-use (requires billing) | Varies by tier and model |
+| Gemini | Free tier available | Varies by region and model |
+
+**Important Notes:**
+- **OpenAI**: Requires a paid account with billing information. Free trial credits are no longer available for new accounts as of April 2023. Check current pricing at https://openai.com/pricing
+- **Gemini**: Offers a free tier with rate limits that vary by region and model. Check current limits at https://ai.google.dev/pricing
+- All rate limits and pricing are subject to change. Always verify current information on official provider websites.
 
 ## Best Practices
 
@@ -300,17 +305,23 @@ To add a new AI provider (e.g., Anthropic Claude, Cohere):
 
 ### Latency
 
-Different providers have different response times:
+Different providers have different response times (approximate values under typical conditions):
 
 - **OpenAI GPT-3.5**: ~2-5 seconds
 - **Gemini 1.5 Flash**: ~1-3 seconds
+
+**Note**: Response times may vary significantly based on request complexity, server load, geographic location, and network conditions. These are typical estimates and actual performance may differ.
 
 Fallback adds latency only when primary provider fails.
 
 ### Cost
 
-- **OpenAI**: Paid per token (1M tokens ≈ $0.50-$2.00)
-- **Gemini**: Free tier available, then paid
+Provider pricing varies and is subject to change. Current pricing information:
+
+- **OpenAI**: Pay-per-use model, approximately $0.50-$1.50 per 1M input/output tokens for GPT-3.5-turbo. For current pricing, see https://openai.com/pricing
+- **Gemini**: Free tier available with rate limits, then pay-per-use. For current pricing, see https://ai.google.dev/pricing
+
+**Important**: Always check official pricing pages for the most up-to-date information as rates and models evolve frequently.
 
 ### Reliability
 
