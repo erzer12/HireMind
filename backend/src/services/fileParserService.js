@@ -8,13 +8,18 @@ import { ApiError } from '../middleware/errorHandler.js';
  * @returns {Promise<string>} Extracted text
  */
 export async function parsePDF(fileBuffer) {
+  let parser;
   try {
-    const pdfParse = new PDFParse();
-    const data = await pdfParse.parseBuffer(fileBuffer);
-    return data.text;
+    parser = new PDFParse({ data: fileBuffer });
+    const result = await parser.getText();
+    return result.text;
   } catch (error) {
     console.error('PDF parsing error:', error);
     throw new ApiError(400, `Failed to parse PDF file: ${error.message}`);
+  } finally {
+    if (parser) {
+      await parser.destroy();
+    }
   }
 }
 
