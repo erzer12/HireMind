@@ -417,6 +417,8 @@ The system automatically retries with the next provider for:
 ✅ Successfully generated text with Gemini
 ```
 
+**📖 For complete documentation on the AI fallback system**, including troubleshooting, testing, and adding new providers, see **[AI_FALLBACK.md](./AI_FALLBACK.md)**.
+
 ## Troubleshooting
 
 ### "No AI provider API keys configured"
@@ -560,10 +562,15 @@ You are free to:
 
 See [TEMPLATES.md](./TEMPLATES.md) for full documentation on template usage and customization.
 
+## Additional Documentation
+
+- **[AI_FALLBACK.md](./AI_FALLBACK.md)** - Comprehensive guide to the AI provider fallback system, including configuration, troubleshooting, and best practices
+- **[TEMPLATES.md](./TEMPLATES.md)** - Complete documentation on resume templates, customization, and adding new templates
+
 ## Acknowledgments
 
 - Built with [React](https://react.dev/)
-- Powered by [OpenAI](https://openai.com/)
+- Powered by [OpenAI](https://openai.com/) and [Google Gemini](https://deepmind.google/technologies/gemini/)
 - Backend framework: [Express](https://expressjs.com/)
 - Frontend tooling: [Vite](https://vitejs.dev/)
 - Resume design inspiration from [JSON Resume](https://jsonresume.org/), [Awesome-CV](https://github.com/posquit0/Awesome-CV), and [Start Bootstrap](https://startbootstrap.com/)
