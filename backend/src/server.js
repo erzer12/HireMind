@@ -1,13 +1,9 @@
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import resumeRoutes from './routes/resume.js';
 import coverLetterRoutes from './routes/coverLetter.js';
 import portfolioRoutes from './routes/portfolio.js';
 import { errorHandler } from './middleware/errorHandler.js';
-
-// Load environment variables
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;

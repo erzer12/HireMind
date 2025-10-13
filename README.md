@@ -74,6 +74,8 @@ HireMind/
    ```bash
    cp .env.example .env
    ```
+   
+   **Important:** The `.env.example` file is only a template. You must create your own `.env` file for the application to work. The `.env` file is git-ignored for security and should never be committed to version control.
 
 4. Configure your `.env` file with your OpenAI API key:
    ```env
@@ -82,6 +84,8 @@ HireMind/
    OPENAI_API_KEY=your_openai_api_key_here
    OPENAI_MODEL=gpt-3.5-turbo
    ```
+   
+   **Note:** Replace `your_openai_api_key_here` with your actual OpenAI API key from https://platform.openai.com/api-keys
 
 5. Start the backend server:
    ```bash
@@ -195,16 +199,29 @@ HireMind/
 
 ## Configuration
 
+### Environment Variables Setup
+
+**Important:** This project uses `.env` files to manage environment variables. The `.env.example` files in both `backend/` and `frontend/` directories are **templates only** and are not loaded by the application. You must create your own `.env` files from these templates.
+
 ### Backend Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `PORT` | Server port | 3001 |
-| `NODE_ENV` | Environment | development |
-| `OPENAI_API_KEY` | OpenAI API key | - |
-| `OPENAI_MODEL` | GPT model to use | gpt-3.5-turbo |
+Create a `.env` file in the `backend/` directory with the following variables:
+
+| Variable | Description | Default | Required |
+|----------|-------------|---------|----------|
+| `PORT` | Server port | 3001 | No |
+| `NODE_ENV` | Environment (development/production) | development | No |
+| `OPENAI_API_KEY` | Your OpenAI API key | - | **Yes** |
+| `OPENAI_MODEL` | GPT model to use | gpt-3.5-turbo | No |
+
+**Note:** 
+- The backend will display a warning if `OPENAI_API_KEY` is not set, and AI features will not work until configured.
+- Environment variables are loaded using the `-r dotenv/config` flag when starting the server, ensuring they're available before any application code runs.
+- The `.env` file is git-ignored and should never be committed to version control.
 
 ### Frontend Environment Variables
+
+Create a `.env` file in the `frontend/` directory (optional - defaults are provided):
 
 | Variable | Description | Default |
 |----------|-------------|---------|
@@ -239,9 +256,18 @@ npm run preview  # Preview production build locally
 ## Troubleshooting
 
 ### "OpenAI API key is not configured"
-- Ensure you've created a `.env` file in the backend directory
-- Add your OpenAI API key to the `.env` file
-- Restart the backend server
+This warning appears when the `OPENAI_API_KEY` is not found in your environment variables.
+
+**Solution:**
+1. Ensure you've created a `.env` file (not `.env.example`) in the `backend/` directory
+2. Add your actual OpenAI API key to the `.env` file:
+   ```env
+   OPENAI_API_KEY=sk-your-actual-key-here
+   ```
+3. **Important:** Restart the backend server completely after creating/modifying the `.env` file
+4. Verify the `.env` file is in the correct location (`backend/.env`, not root directory)
+
+**Note:** The `.env.example` file is only a template and is NOT loaded by the application. You must create your own `.env` file.
 
 ### "Failed to fetch" errors
 - Ensure the backend server is running on port 3001
