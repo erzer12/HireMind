@@ -1,15 +1,13 @@
 import OpenAI from 'openai';
 import { ApiError } from '../middleware/errorHandler.js';
 
-let openai = null;
+// Initialize OpenAI client if API key is available
+const openai = process.env.OPENAI_API_KEY 
+  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  : null;
 
-// Only initialize OpenAI if API key is available
-if (process.env.OPENAI_API_KEY) {
-  openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-  });
-} else {
-  console.warn('⚠️  OPENAI_API_KEY not configured. AI features will not work until you add your API key to .env');
+if (!openai) {
+  console.warn('⚠️  OPENAI_API_KEY environment variable not set. AI features will not work until you configure your OpenAI API key.');
 }
 
 /**
@@ -21,7 +19,7 @@ if (process.env.OPENAI_API_KEY) {
 export async function generateText(prompt, systemMessage = 'You are a helpful assistant specialized in professional career documents.') {
   try {
     if (!openai) {
-      throw new ApiError(500, 'OpenAI API key is not configured. Please add your OPENAI_API_KEY to the .env file.');
+      throw new ApiError(500, 'OpenAI API key is not configured. Please set the OPENAI_API_KEY environment variable.');
     }
 
     const response = await openai.chat.completions.create({
