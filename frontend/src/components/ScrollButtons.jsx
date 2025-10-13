@@ -6,6 +6,8 @@ function ScrollButtons() {
   const [isAtBottom, setIsAtBottom] = useState(false);
 
   useEffect(() => {
+    let timeoutId = null;
+
     const toggleVisibility = () => {
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
       const scrollHeight = document.documentElement.scrollHeight;
@@ -18,10 +20,27 @@ function ScrollButtons() {
       setIsAtBottom(scrollTop + clientHeight >= scrollHeight - 100);
     };
 
-    window.addEventListener('scroll', toggleVisibility);
+    // Throttle scroll events for performance
+    const handleScroll = () => {
+      if (timeoutId) {
+        return;
+      }
+      
+      timeoutId = setTimeout(() => {
+        toggleVisibility();
+        timeoutId = null;
+      }, 100); // Throttle to once every 100ms
+    };
+
+    window.addEventListener('scroll', handleScroll);
     toggleVisibility(); // Check initial state
 
-    return () => window.removeEventListener('scroll', toggleVisibility);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   }, []);
 
   const scrollToTop = () => {
