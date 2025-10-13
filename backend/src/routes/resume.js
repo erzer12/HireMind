@@ -1,6 +1,6 @@
 import express from 'express';
 import multer from 'multer';
-import { createResume, getTemplates, parseResume, analyzeJD, compareWithJD, createTailoredResume } from '../controllers/resumeController.js';
+import { createResume, getTemplates, parseResume, analyzeJD, compareWithJD, createTailoredResume, getSessionResume, clearSessionResume } from '../controllers/resumeController.js';
 
 const router = express.Router();
 
@@ -61,5 +61,17 @@ router.post('/analyze-jd', upload.single('file'), analyzeJD);
  * Compare resume data with job description
  */
 router.post('/compare', compareWithJD);
+
+/**
+ * GET /api/resume/session
+ * Get uploaded resume data from session
+ */
+router.get('/session', getSessionResume);
+
+/**
+ * DELETE /api/resume/session
+ * Clear uploaded resume data from session
+ */
+router.delete('/session', clearSessionResume);
 
 export default router;

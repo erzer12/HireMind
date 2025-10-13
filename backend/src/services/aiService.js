@@ -402,3 +402,53 @@ Provide the complete resume content in markdown format.`;
   
   return await generateText(prompt, systemMessage);
 }
+
+/**
+ * Parse extracted resume text into structured data
+ * @param {string} resumeText - Raw text extracted from resume file
+ * @returns {Promise<Object>} Structured resume data
+ */
+export async function parseResumeText(resumeText) {
+  const prompt = `Parse the following resume text and extract structured information in JSON format:
+
+Resume Text:
+${resumeText}
+
+Please provide a JSON response with the following structure:
+{
+  "name": "Full name of the candidate",
+  "email": "Email address",
+  "phone": "Phone number",
+  "location": "Location/address",
+  "summary": "Professional summary or objective",
+  "skills": ["skill1", "skill2", ...],
+  "experience": [
+    {
+      "position": "Job title",
+      "company": "Company name",
+      "duration": "Time period (e.g., Jan 2020 - Present)",
+      "description": "Job description and achievements"
+    }
+  ],
+  "education": [
+    {
+      "degree": "Degree name",
+      "institution": "School/University name",
+      "year": "Graduation year or period"
+    }
+  ]
+}
+
+IMPORTANT: 
+- Return ONLY valid, minified JSON. No code blocks, no comments, no trailing commas, no additional text.
+- Extract all information available in the resume text.
+- If a field is not found, use an empty string for strings or empty array for arrays.
+- For skills, extract all technical and professional skills mentioned.
+- For experience, include all work history with as much detail as available.`;
+
+  const systemMessage = 'You are an expert at parsing and extracting structured data from resume documents. Always respond with valid, minified JSON only, no additional text or code blocks.';
+  
+  const response = await generateText(prompt, systemMessage);
+  
+  return parseAIJsonResponse(response, 'resume parsing');
+}

@@ -29,6 +29,8 @@ function ResumeForm({ onGenerate, loading }) {
   const [uploadingJD, setUploadingJD] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [hasUploadedResume, setHasUploadedResume] = useState(false);
+  const [uploadedResumeInfo, setUploadedResumeInfo] = useState(null);
   
   useEffect(() => {
     // Fetch available templates
@@ -40,6 +42,18 @@ function ResumeForm({ onGenerate, loading }) {
       })
       .catch(err => {
         console.error('Failed to fetch templates:', err);
+      });
+
+    // Check if there's an uploaded resume in session
+    api.getSessionResume()
+      .then(response => {
+        if (response.success && response.data.hasResume) {
+          setHasUploadedResume(true);
+          setUploadedResumeInfo(response.data.resumeData);
+        }
+      })
+      .catch(err => {
+        console.error('Failed to check session resume:', err);
       });
   }, []);
 
@@ -99,13 +113,52 @@ function ResumeForm({ onGenerate, loading }) {
     try {
       const response = await api.parseResume(file);
       if (response.success) {
-        alert('Resume uploaded successfully! Text extracted:\n\n' + response.data.text.substring(0, 200) + '...\n\nYou can now manually fill in the form fields.');
-        // Note: In a production app, you'd want to use AI to parse the extracted text into structured data
+        const data = response.data;
+        setHasUploadedResume(true);
+        setUploadedResumeInfo(data);
+        
+        // Optionally populate form fields with parsed data
+        if (data.name || data.email || data.skills) {
+          const shouldPopulate = window.confirm(
+            'Resume uploaded and parsed successfully!\n\n' +
+            'Would you like to populate the form with the extracted data?\n' +
+            '(Click Cancel to keep current form data)'
+          );
+          
+          if (shouldPopulate) {
+            setFormData({
+              ...formData,
+              name: data.name || formData.name,
+              email: data.email || formData.email,
+              phone: data.phone || formData.phone,
+              location: data.location || formData.location,
+              summary: data.summary || formData.summary,
+              skills: data.skills ? data.skills.join(', ') : formData.skills,
+              experience: data.experience && data.experience.length > 0 ? data.experience : formData.experience,
+              education: data.education && data.education.length > 0 ? data.education : formData.education,
+            });
+          }
+        }
+        
+        alert('✅ Resume uploaded and parsed successfully!\n\nThe data is stored and will be used for job comparisons.');
       }
     } catch (error) {
       alert('Failed to upload resume: ' + error.message);
+      setHasUploadedResume(false);
+      setUploadedResumeInfo(null);
     } finally {
       setUploadingResume(false);
+    }
+  };
+
+  const handleClearUploadedResume = async () => {
+    try {
+      await api.clearSessionResume();
+      setHasUploadedResume(false);
+      setUploadedResumeInfo(null);
+      alert('Uploaded resume cleared successfully');
+    } catch (error) {
+      alert('Failed to clear resume: ' + error.message);
     }
   };
 
@@ -156,14 +209,24 @@ function ResumeForm({ onGenerate, loading }) {
 
     setAnalyzing(true);
     try {
-      const resumeData = {
-        ...formData,
-        skills: formData.skills.split(',').map(s => s.trim()).filter(s => s),
-      };
+      // If there's an uploaded resume, use it (backend will fetch from session)
+      // Otherwise, use form data
+      let resumeData = null;
+      if (!hasUploadedResume) {
+        resumeData = {
+          ...formData,
+          skills: formData.skills.split(',').map(s => s.trim()).filter(s => s),
+        };
+      }
+      
       const response = await api.compareResumeWithJD(resumeData, jobDescription);
       if (response.success) {
         setSuggestions(response.data.suggestions);
         setShowSuggestions(true);
+        
+        if (response.data.usedUploadedResume) {
+          console.log('✅ Used uploaded resume for comparison');
+        }
       }
     } catch (error) {
       alert('Failed to compare resume: ' + error.message);
@@ -189,6 +252,26 @@ function ResumeForm({ onGenerate, loading }) {
         <p className="upload-description">
           Upload your existing resume to extract information (PDF, DOCX, or TXT)
         </p>
+        {hasUploadedResume && uploadedResumeInfo && (
+          <div className="uploaded-resume-status">
+            <p>✅ <strong>Resume uploaded:</strong> {uploadedResumeInfo.filename}</p>
+            <p>📅 Uploaded: {new Date(uploadedResumeInfo.uploadedAt).toLocaleString()}</p>
+            {uploadedResumeInfo.name && <p>👤 Name: {uploadedResumeInfo.name}</p>}
+            {uploadedResumeInfo.email && <p>📧 Email: {uploadedResumeInfo.email}</p>}
+            {uploadedResumeInfo.skills && uploadedResumeInfo.skills.length > 0 && (
+              <p>🔧 Skills: {uploadedResumeInfo.skills.slice(0, 5).join(', ')}
+                {uploadedResumeInfo.skills.length > 5 ? ` + ${uploadedResumeInfo.skills.length - 5} more` : ''}
+              </p>
+            )}
+            <button
+              type="button"
+              onClick={handleClearUploadedResume}
+              className="clear-resume-button"
+            >
+              🗑️ Clear Uploaded Resume
+            </button>
+          </div>
+        )}
         <div className="file-upload-wrapper">
           <input
             type="file"
@@ -199,7 +282,7 @@ function ResumeForm({ onGenerate, loading }) {
             className="file-input"
           />
           <label htmlFor="resume-upload" className="file-upload-button">
-            {uploadingResume ? '⏳ Uploading...' : '📄 Upload Resume'}
+            {uploadingResume ? '⏳ Uploading...' : hasUploadedResume ? '🔄 Replace Resume' : '📄 Upload Resume'}
           </label>
         </div>
       </div>

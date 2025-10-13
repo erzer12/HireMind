@@ -135,6 +135,7 @@ export const api = {
 
       const response = await fetch(`${API_BASE_URL}/resume/parse`, {
         method: 'POST',
+        credentials: 'include',
         body: formData,
       });
 
@@ -192,6 +193,7 @@ export const api = {
     try {
       const response = await fetch(`${API_BASE_URL}/resume/compare`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -201,6 +203,48 @@ export const api = {
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error || 'Failed to compare resume');
+      }
+
+      return response.json();
+    } catch (error) {
+      handleFetchError(error);
+    }
+  },
+
+  /**
+   * Get session resume data
+   */
+  async getSessionResume() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/resume/session`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to get session resume');
+      }
+
+      return response.json();
+    } catch (error) {
+      handleFetchError(error);
+    }
+  },
+
+  /**
+   * Clear session resume data
+   */
+  async clearSessionResume() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/resume/session`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to clear session resume');
       }
 
       return response.json();

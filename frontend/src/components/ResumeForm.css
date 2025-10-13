@@ -514,3 +514,47 @@
     font-size: 1.5em;
   }
 }
+
+/* Uploaded Resume Status Styles */
+.uploaded-resume-status {
+  background: #e8f5e9;
+  border: 2px solid #4CAF50;
+  border-radius: 10px;
+  padding: 15px 20px;
+  margin-bottom: 15px;
+}
+
+.uploaded-resume-status p {
+  margin: 8px 0;
+  color: #2c3e50;
+  font-size: 0.95em;
+  line-height: 1.5;
+}
+
+.uploaded-resume-status p:first-child {
+  font-size: 1em;
+  color: #2e7d32;
+}
+
+.clear-resume-button {
+  background: #ff5252;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9em;
+  font-weight: 500;
+  margin-top: 10px;
+  transition: all 0.3s ease;
+}
+
+.clear-resume-button:hover {
+  background: #e53935;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 82, 82, 0.3);
+}
+
+.clear-resume-button:active {
+  transform: translateY(0);
+}

@@ -1,0 +1,48 @@
+Senior Full Stack Developer
+
+Location: Remote (US-based)
+Experience: 5+ years
+Employment Type: Full-time
+
+About the Role:
+We are seeking an experienced Senior Full Stack Developer to join our growing engineering team. 
+You will be responsible for designing, developing, and maintaining scalable web applications 
+that serve millions of users globally.
+
+Required Skills:
+- 5+ years of professional software development experience
+- Strong proficiency in JavaScript/TypeScript and modern frameworks (React, Vue, or Angular)
+- Experience with Node.js and building RESTful APIs
+- Solid understanding of relational databases (PostgreSQL, MySQL)
+- Experience with cloud platforms (AWS, Azure, or GCP)
+- Knowledge of containerization (Docker) and orchestration (Kubernetes)
+- Strong understanding of software design patterns and best practices
+- Experience with version control (Git) and CI/CD pipelines
+- Excellent problem-solving and debugging skills
+
+Preferred Skills:
+- Experience with GraphQL
+- Knowledge of microservices architecture
+- Familiarity with Redis or other caching solutions
+- Experience with automated testing (Jest, Mocha, Cypress)
+- Understanding of DevOps practices
+- Experience mentoring junior developers
+- Background in Agile/Scrum methodologies
+
+Responsibilities:
+- Design and develop scalable, high-performance web applications
+- Write clean, maintainable, and well-documented code
+- Participate in code reviews and provide constructive feedback
+- Collaborate with cross-functional teams (product, design, QA)
+- Optimize application performance and ensure security best practices
+- Mentor junior team members and contribute to technical decisions
+- Stay up-to-date with emerging technologies and industry trends
+
+What We Offer:
+- Competitive salary and equity package
+- Comprehensive health, dental, and vision insurance
+- 401(k) with company match
+- Flexible work schedule and remote work options
+- Professional development budget
+- Modern tech stack and tools
+- Collaborative and inclusive work environment

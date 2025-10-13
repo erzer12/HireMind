@@ -1,4 +1,4 @@
-import { generateResume, analyzeJobDescription, compareResumeWithJD, generateTailoredResume } from '../services/aiService.js';
+import { generateResume, analyzeJobDescription, compareResumeWithJD, generateTailoredResume, parseResumeText } from '../services/aiService.js';
 import { renderResume, getAvailableTemplates } from '../services/templateService.js';
 import { parseFile } from '../services/fileParserService.js';
 import { ApiError } from '../middleware/errorHandler.js';
@@ -68,12 +68,46 @@ export const parseResume = async (req, res, next) => {
 
     const extractedText = await parseFile(req.file);
 
+    if (!extractedText || extractedText.trim().length === 0) {
+      throw new ApiError(400, 'Failed to extract text from resume. The file may be empty or corrupted.');
+    }
+
+    // Parse the extracted text into structured data using AI
+    console.log('📄 Parsing resume text into structured data...');
+    const structuredData = await parseResumeText(extractedText);
+
+    // Validate that we got meaningful data
+    if (!structuredData.name && !structuredData.email && 
+        (!structuredData.skills || structuredData.skills.length === 0) &&
+        (!structuredData.experience || structuredData.experience.length === 0)) {
+      console.warn('⚠️  Resume parsing returned minimal data');
+      throw new ApiError(400, 'Could not extract meaningful information from the resume. Please ensure the file contains valid resume content.');
+    }
+
+    // Store structured data in session for later use
+    req.session.resumeData = {
+      ...structuredData,
+      filename: req.file.originalname,
+      uploadedAt: new Date().toISOString(),
+      rawText: extractedText
+    };
+
+    await new Promise((resolve, reject) => {
+      req.session.save((err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+
+    console.log('✅ Resume parsed and stored in session');
+
     res.json({
       success: true,
       data: {
-        text: extractedText,
+        ...structuredData,
         filename: req.file.originalname,
-        extractedAt: new Date().toISOString()
+        extractedAt: new Date().toISOString(),
+        message: 'Resume uploaded and parsed successfully! Data is ready for comparison.'
       }
     });
   } catch (error) {
@@ -117,10 +151,16 @@ export const analyzeJD = async (req, res, next) => {
  */
 export const compareWithJD = async (req, res, next) => {
   try {
-    const { resumeData, jobDescription } = req.body;
+    let { resumeData, jobDescription } = req.body;
+
+    // If resumeData not provided in body, try to use session data
+    if (!resumeData && req.session.resumeData) {
+      console.log('📋 Using uploaded resume data from session');
+      resumeData = req.session.resumeData;
+    }
 
     if (!resumeData) {
-      throw new ApiError(400, 'Resume data is required');
+      throw new ApiError(400, 'Resume data is required. Please upload a resume or fill in the form fields.');
     }
 
     if (!jobDescription) {
@@ -133,7 +173,8 @@ export const compareWithJD = async (req, res, next) => {
       success: true,
       data: {
         suggestions,
-        comparedAt: new Date().toISOString()
+        comparedAt: new Date().toISOString(),
+        usedUploadedResume: !!req.session.resumeData && !req.body.resumeData
       }
     });
   } catch (error) {
@@ -191,6 +232,63 @@ export const createTailoredResume = async (req, res, next) => {
         }
       });
     }
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Get uploaded resume data from session
+ */
+export const getSessionResume = async (req, res, next) => {
+  try {
+    if (!req.session.resumeData) {
+      res.json({
+        success: true,
+        data: {
+          hasResume: false,
+          message: 'No resume data in session'
+        }
+      });
+      return;
+    }
+
+    const { rawText, ...resumeData } = req.session.resumeData;
+    
+    res.json({
+      success: true,
+      data: {
+        hasResume: true,
+        resumeData
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Clear uploaded resume data from session
+ */
+export const clearSessionResume = async (req, res, next) => {
+  try {
+    if (req.session.resumeData) {
+      delete req.session.resumeData;
+      await new Promise((resolve, reject) => {
+        req.session.save((err) => {
+          if (err) reject(err);
+          else resolve();
+        });
+      });
+      console.log('🗑️  Session resume data cleared');
+    }
+
+    res.json({
+      success: true,
+      data: {
+        message: 'Session resume data cleared successfully'
+      }
+    });
   } catch (error) {
     next(error);
   }
