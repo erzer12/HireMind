@@ -23,8 +23,8 @@ function renderTemplate(template, data) {
       let itemResult = itemTemplate;
       
       // Replace {{this}} for simple values (e.g., skills array)
-      if (typeof item !== 'object') {
-        itemResult = itemResult.replace(/\{\{this\}\}/g, item);
+      if (typeof item !== 'object' || item === null || Array.isArray(item)) {
+        itemResult = itemResult.replace(/\{\{this\}\}/g, String(item));
         return itemResult;
       }
       
@@ -37,7 +37,7 @@ function renderTemplate(template, data) {
       // Replace {{property}} for object properties
       itemResult = itemResult.replace(/\{\{([^#\/\s}]+)\}\}/g, (m, prop) => {
         const value = item[prop.trim()];
-        return value !== undefined && value !== null ? value : '';
+        return value !== undefined && value !== null ? String(value) : '';
       });
       
       return itemResult;
@@ -53,7 +53,7 @@ function renderTemplate(template, data) {
   // Handle simple variables: {{variable}} (last to avoid conflicts)
   result = result.replace(/\{\{([^#\/\s}]+)\}\}/g, (match, key) => {
     const value = data[key.trim()];
-    return value !== undefined && value !== null ? value : '';
+    return value !== undefined && value !== null ? String(value) : '';
   });
   
   return result;
