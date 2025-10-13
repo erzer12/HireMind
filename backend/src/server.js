@@ -1,10 +1,15 @@
 import express from 'express';
 import cors from 'cors';
 import session from 'express-session';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import resumeRoutes from './routes/resume.js';
 import coverLetterRoutes from './routes/coverLetter.js';
 import portfolioRoutes from './routes/portfolio.js';
 import { errorHandler } from './middleware/errorHandler.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -41,6 +46,17 @@ app.get('/api/health', (req, res) => {
 app.use('/api/resume', resumeRoutes);
 app.use('/api/cover-letter', coverLetterRoutes);
 app.use('/api/portfolio', portfolioRoutes);
+
+// Serve static files from public directory in production
+if (process.env.NODE_ENV === 'production') {
+  const publicPath = path.join(__dirname, '..', 'public');
+  app.use(express.static(publicPath));
+  
+  // Serve index.html for all non-API routes (SPA support)
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(publicPath, 'index.html'));
+  });
+}
 
 // Error handling middleware
 app.use(errorHandler);
