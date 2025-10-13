@@ -1,9 +1,16 @@
 import OpenAI from 'openai';
 import { ApiError } from '../middleware/errorHandler.js';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+let openai = null;
+
+// Only initialize OpenAI if API key is available
+if (process.env.OPENAI_API_KEY) {
+  openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+} else {
+  console.warn('⚠️  OPENAI_API_KEY not configured. AI features will not work until you add your API key to .env');
+}
 
 /**
  * Generate text using OpenAI's GPT model
@@ -13,8 +20,8 @@ const openai = new OpenAI({
  */
 export async function generateText(prompt, systemMessage = 'You are a helpful assistant specialized in professional career documents.') {
   try {
-    if (!process.env.OPENAI_API_KEY) {
-      throw new ApiError(500, 'OpenAI API key is not configured');
+    if (!openai) {
+      throw new ApiError(500, 'OpenAI API key is not configured. Please add your OPENAI_API_KEY to the .env file.');
     }
 
     const response = await openai.chat.completions.create({
