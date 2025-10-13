@@ -558,3 +558,102 @@
 .clear-resume-button:active {
   transform: translateY(0);
 }
+
+/* Interactive Skill Selection Styles */
+.skill-tags-interactive {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.skill-checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  margin: 0;
+}
+
+.skill-checkbox {
+  margin-right: 8px;
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+  accent-color: #667eea;
+}
+
+.skill-checkbox-label:hover .skill-tag {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.skill-checkbox:checked + .skill-tag {
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+}
+
+.skill-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.apply-skills-button {
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.apply-skills-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+.apply-skills-button:disabled {
+  background: linear-gradient(135deg, #ccc 0%, #aaa 100%);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.6;
+}
+
+/* Autofill Section Styles */
+.autofill-section {
+  background: linear-gradient(135deg, #e8f4fd 0%, #ffffff 100%);
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  border: 2px dashed #2196F3;
+  text-align: center;
+}
+
+.autofill-button {
+  background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+}
+
+.autofill-button:hover {
+  background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+}
+
+.autofill-button:active {
+  transform: translateY(0);
+}
+

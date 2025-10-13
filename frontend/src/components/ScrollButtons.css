@@ -1,0 +1,81 @@
+.scroll-buttons {
+  position: fixed;
+  right: 30px;
+  bottom: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 1000;
+}
+
+.scroll-button {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.9;
+}
+
+.scroll-button:hover {
+  opacity: 1;
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.scroll-button:active {
+  transform: scale(0.95);
+}
+
+.scroll-button:focus {
+  outline: 3px solid rgba(102, 126, 234, 0.5);
+  outline-offset: 2px;
+}
+
+.scroll-to-top {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.scroll-to-bottom {
+  background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+  box-shadow: 0 4px 15px rgba(33, 150, 243, 0.4);
+}
+
+.scroll-to-bottom:hover {
+  box-shadow: 0 6px 20px rgba(33, 150, 243, 0.6);
+}
+
+@media (max-width: 768px) {
+  .scroll-buttons {
+    right: 20px;
+    bottom: 20px;
+  }
+
+  .scroll-button {
+    width: 45px;
+    height: 45px;
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .scroll-buttons {
+    right: 15px;
+    bottom: 15px;
+  }
+
+  .scroll-button {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+}

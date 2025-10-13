@@ -4,6 +4,7 @@ import ResumeForm from './components/ResumeForm';
 import CoverLetterForm from './components/CoverLetterForm';
 import PortfolioForm from './components/PortfolioForm';
 import ResultDisplay from './components/ResultDisplay';
+import ScrollButtons from './components/ScrollButtons';
 import { api } from './services/api';
 
 function App() {
@@ -138,6 +139,8 @@ function App() {
           </a>
         </div>
       </footer>
+
+      <ScrollButtons />
     </div>
   );
 }

@@ -216,12 +216,18 @@ export async function generateText(prompt, systemMessage = 'You are a helpful as
  * Generate a professional resume based on user information
  */
 export async function generateResume(userInfo) {
+  const profileLinks = [];
+  if (userInfo.linkedin) profileLinks.push(`LinkedIn: ${userInfo.linkedin}`);
+  if (userInfo.github) profileLinks.push(`GitHub: ${userInfo.github}`);
+  if (userInfo.portfolio) profileLinks.push(`Portfolio: ${userInfo.portfolio}`);
+
   const prompt = `Create a professional resume based on the following information:
 
 Name: ${userInfo.name}
 Email: ${userInfo.email}
 Phone: ${userInfo.phone || 'Not provided'}
 Location: ${userInfo.location || 'Not provided'}
+${profileLinks.length > 0 ? `\nProfile Links:\n${profileLinks.join('\n')}` : ''}
 
 Professional Summary: ${userInfo.summary || 'Not provided'}
 
@@ -242,7 +248,7 @@ ${userInfo.education?.map(edu => `
   Year: ${edu.year}
 `).join('\n') || 'Not provided'}
 
-Generate a well-formatted, professional resume in markdown format.`;
+Generate a well-formatted, professional resume in markdown format. Include the profile links in the contact information section if provided.`;
 
   const systemMessage = 'You are an expert resume writer. Create professional, ATS-friendly resumes that highlight the candidate\'s strengths.';
   
@@ -253,11 +259,17 @@ Generate a well-formatted, professional resume in markdown format.`;
  * Generate a tailored cover letter
  */
 export async function generateCoverLetter(userInfo, jobInfo) {
+  const profileLinks = [];
+  if (userInfo.linkedin) profileLinks.push(`LinkedIn: ${userInfo.linkedin}`);
+  if (userInfo.github) profileLinks.push(`GitHub: ${userInfo.github}`);
+  if (userInfo.portfolio) profileLinks.push(`Portfolio: ${userInfo.portfolio}`);
+
   const prompt = `Create a professional cover letter for the following:
 
 Applicant Information:
 Name: ${userInfo.name}
 Email: ${userInfo.email}
+${profileLinks.length > 0 ? `Profile Links: ${profileLinks.join(', ')}` : ''}
 
 Target Position: ${jobInfo.position || 'Not specified'}
 Company: ${jobInfo.company || 'Not specified'}
@@ -268,7 +280,7 @@ ${userInfo.summary || 'Not provided'}
 
 Key Skills: ${userInfo.skills?.join(', ') || 'Not provided'}
 
-Generate a compelling cover letter that highlights relevant experience and shows enthusiasm for the position.`;
+Generate a compelling cover letter that highlights relevant experience and shows enthusiasm for the position. Include the profile links in the header if provided.`;
 
   const systemMessage = 'You are an expert cover letter writer. Create personalized, engaging cover letters that connect the candidate\'s experience to the job requirements.';
   
@@ -279,6 +291,11 @@ Generate a compelling cover letter that highlights relevant experience and shows
  * Generate portfolio webpage content
  */
 export async function generatePortfolio(userInfo) {
+  const profileLinks = [];
+  if (userInfo.linkedin) profileLinks.push(`LinkedIn: ${userInfo.linkedin}`);
+  if (userInfo.github) profileLinks.push(`GitHub: ${userInfo.github}`);
+  if (userInfo.portfolio) profileLinks.push(`Personal Website: ${userInfo.portfolio}`);
+
   const prompt = `Create HTML content for a professional portfolio webpage based on:
 
 Name: ${userInfo.name}
@@ -286,6 +303,8 @@ Title: ${userInfo.title || 'Professional'}
 Bio: ${userInfo.bio || userInfo.summary || 'Not provided'}
 
 Skills: ${userInfo.skills?.join(', ') || 'Not provided'}
+
+${profileLinks.length > 0 ? `Profile Links:\n${profileLinks.join('\n')}\n` : ''}
 
 Projects:
 ${userInfo.projects?.map(proj => `
@@ -295,7 +314,7 @@ ${userInfo.projects?.map(proj => `
   Link: ${proj.link || 'Not provided'}
 `).join('\n') || 'Not provided'}
 
-Generate a modern, professional HTML portfolio page with inline CSS styling. Include sections for About, Skills, and Projects.`;
+Generate a modern, professional HTML portfolio page with inline CSS styling. Include sections for About, Skills, and Projects. If profile links are provided, include them as clickable icons or buttons in the contact section.`;
 
   const systemMessage = 'You are a web designer specialized in creating professional portfolio webpages. Generate clean, modern HTML with inline CSS.';
   
