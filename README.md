@@ -5,6 +5,10 @@
 ## Features
 
 - 📝 **Resume Generator**: Create ATS-friendly professional resumes based on your experience and skills
+  - **Multiple Templates**: Choose from modern, classic, or minimal designs
+  - **HTML Export**: Download resumes as formatted HTML files
+  - **PDF Export**: Print directly to PDF from browser
+  - **Template Customization**: Easy to add new templates
 - 💼 **Cover Letter Generator**: Generate tailored cover letters for specific job applications
 - 🌐 **Portfolio Generator**: Build a beautiful HTML portfolio webpage showcasing your projects
 - 🤖 **AI-Powered**: Leverages OpenAI's GPT models for intelligent content generation
@@ -34,6 +38,7 @@ HireMind/
 │   │   ├── controllers/    # Request handlers
 │   │   ├── routes/         # API routes
 │   │   ├── services/       # Business logic (AI service)
+│   │   ├── templates/      # Resume templates (HTML/CSS)
 │   │   ├── middleware/     # Express middleware
 │   │   └── server.js       # Entry point
 │   ├── package.json
@@ -48,7 +53,8 @@ HireMind/
 │   ├── package.json
 │   └── .env.example
 │
-└── README.md
+├── README.md
+└── TEMPLATES.md           # Template documentation
 ```
 
 ## Setup Instructions
@@ -123,9 +129,20 @@ HireMind/
 1. **Start Both Servers**: Ensure both backend (port 3001) and frontend (port 5173) are running
 2. **Open the App**: Navigate to `http://localhost:5173` in your browser
 3. **Choose a Feature**: Select Resume, Cover Letter, or Portfolio from the navigation tabs
-4. **Fill the Form**: Enter your information in the provided fields
-5. **Generate Content**: Click the generate button and wait for AI to create your content
-6. **Export**: Copy to clipboard or download the generated content
+4. **Select Template** (for resumes): Choose from Modern Professional, Classic ATS, or Minimal Sidebar designs
+5. **Fill the Form**: Enter your information in the provided fields
+6. **Generate Content**: Click the generate button and wait for AI to create your content
+7. **Export**: Copy to clipboard, download as HTML, or print to PDF
+
+### Resume Templates
+
+HireMind offers three professional resume templates:
+
+- **Modern Professional**: Contemporary design with gradient header - perfect for tech and creative roles (ATS Score: 9/10) ⭐
+- **Classic ATS**: Traditional black and white layout optimized for Applicant Tracking Systems (ATS Score: 10/10) ⭐
+- **Minimal Sidebar**: Clean two-column design with dark sidebar (ATS Score: 8/10)
+
+See [TEMPLATES.md](./TEMPLATES.md) for detailed template documentation and instructions for adding new templates.
 
 ## API Endpoints
 
@@ -136,6 +153,7 @@ HireMind/
 - **POST** `/api/resume` - Generate a resume
   ```json
   {
+    "template": "modern",
     "name": "John Doe",
     "email": "john@example.com",
     "phone": "123-456-7890",
@@ -157,6 +175,24 @@ HireMind/
         "year": "2019"
       }
     ]
+  }
+  ```
+
+- **GET** `/api/resume/templates` - Get available resume templates
+  ```json
+  {
+    "success": true,
+    "data": {
+      "templates": [
+        {
+          "id": "modern",
+          "name": "Modern Professional",
+          "description": "A modern resume with gradient header...",
+          "atsScore": 9,
+          "recommended": true
+        }
+      ]
+    }
   }
   ```
 
@@ -282,9 +318,38 @@ This warning appears when the `OPENAI_API_KEY` is not found in your environment 
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
+### Adding New Templates
+
+See [TEMPLATES.md](./TEMPLATES.md) for detailed instructions on creating and adding new resume templates.
+
 ## License
 
 MIT
+
+## Template Attribution
+
+All resume templates included in HireMind are custom-designed for this project and released under the MIT License. They follow best practices and design principles inspired by:
+
+- **JSON Resume** (MIT License): https://jsonresume.org/ - Open-source JSON-based resume standard
+- **Awesome-CV** (LaTeX CC BY-SA 4.0): https://github.com/posquit0/Awesome-CV - Professional LaTeX resume templates
+- **Start Bootstrap Resume** (MIT License): https://startbootstrap.com/theme/resume - Bootstrap-based resume theme
+
+### Template Licenses
+
+Our custom templates (Modern Professional, Classic ATS, Minimal Sidebar):
+- **License**: MIT License
+- **Usage**: Free for personal and commercial use
+- **Attribution**: Appreciated but not required
+- **Modification**: Fully customizable
+
+You are free to:
+- ✅ Use the templates for personal resumes
+- ✅ Use the templates commercially
+- ✅ Modify and customize the templates
+- ✅ Create derivative works
+- ✅ Distribute the templates
+
+See [TEMPLATES.md](./TEMPLATES.md) for full documentation on template usage and customization.
 
 ## Acknowledgments
 
@@ -292,3 +357,4 @@ MIT
 - Powered by [OpenAI](https://openai.com/)
 - Backend framework: [Express](https://expressjs.com/)
 - Frontend tooling: [Vite](https://vitejs.dev/)
+- Resume design inspiration from [JSON Resume](https://jsonresume.org/), [Awesome-CV](https://github.com/posquit0/Awesome-CV), and [Start Bootstrap](https://startbootstrap.com/)

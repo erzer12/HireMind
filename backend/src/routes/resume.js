@@ -1,7 +1,13 @@
 import express from 'express';
-import { createResume } from '../controllers/resumeController.js';
+import { createResume, getTemplates } from '../controllers/resumeController.js';
 
 const router = express.Router();
+
+/**
+ * GET /api/resume/templates
+ * Get available resume templates
+ */
+router.get('/templates', getTemplates);
 
 /**
  * POST /api/resume

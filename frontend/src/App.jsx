@@ -17,8 +17,12 @@ function App() {
     setError(null);
     setResult(null);
     try {
-      const response = await api.generateResume(userInfo);
-      setResult({ type: 'resume', content: response.data.resume });
+      const response = await api.generateResume(userInfo, userInfo.template);
+      setResult({ 
+        type: 'resume', 
+        content: response.data.resume,
+        format: response.data.format || 'markdown'
+      });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -110,6 +114,7 @@ function App() {
             }
             content={result.content}
             type={result.type}
+            format={result.format}
           />
         )}
       </main>
