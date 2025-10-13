@@ -1,4 +1,5 @@
 import OpenAI from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { ApiError } from '../middleware/errorHandler.js';
 
 // Initialize OpenAI client if API key is available
@@ -6,8 +7,27 @@ const openai = process.env.OPENAI_API_KEY
   ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
   : null;
 
-if (!openai) {
-  console.warn('⚠️  OPENAI_API_KEY environment variable not set. AI features will not work until you configure your OpenAI API key.');
+// Initialize Gemini client if API key is available
+const gemini = process.env.GEMINI_API_KEY
+  ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
+  : null;
+
+// Configure provider priority (default: openai, gemini)
+const providerPriority = process.env.AI_PROVIDER_PRIORITY
+  ? process.env.AI_PROVIDER_PRIORITY.split(',').map(p => p.trim())
+  : ['openai', 'gemini'];
+
+// Check if any AI provider is configured
+const hasAnyProvider = openai || gemini;
+
+if (!hasAnyProvider) {
+  console.warn('⚠️  No AI provider API keys configured. AI features will not work until you configure at least one AI provider (OPENAI_API_KEY or GEMINI_API_KEY).');
+} else {
+  const configuredProviders = [];
+  if (openai) configuredProviders.push('OpenAI');
+  if (gemini) configuredProviders.push('Gemini');
+  console.log(`✅ AI providers configured: ${configuredProviders.join(', ')}`);
+  console.log(`📋 Provider priority: ${providerPriority.join(' → ')}`);
 }
 
 /**
@@ -16,30 +36,136 @@ if (!openai) {
  * @param {string} systemMessage - System message for context
  * @returns {Promise<string>} Generated text
  */
-export async function generateText(prompt, systemMessage = 'You are a helpful assistant specialized in professional career documents.') {
-  try {
-    if (!openai) {
-      throw new ApiError(500, 'OpenAI API key is not configured. Please set the OPENAI_API_KEY environment variable.');
-    }
-
-    const response = await openai.chat.completions.create({
-      model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',
-      messages: [
-        { role: 'system', content: systemMessage },
-        { role: 'user', content: prompt }
-      ],
-      temperature: 0.7,
-      max_tokens: 2000,
-    });
-
-    return response.choices[0].message.content;
-  } catch (error) {
-    console.error('OpenAI API Error:', error);
-    if (error.status === 401) {
-      throw new ApiError(401, 'Invalid OpenAI API key');
-    }
-    throw new ApiError(500, `AI generation failed: ${error.message}`);
+async function generateTextWithOpenAI(prompt, systemMessage) {
+  if (!openai) {
+    throw new Error('OpenAI is not configured');
   }
+
+  const response = await openai.chat.completions.create({
+    model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',
+    messages: [
+      { role: 'system', content: systemMessage },
+      { role: 'user', content: prompt }
+    ],
+    temperature: 0.7,
+    max_tokens: 2000,
+  });
+
+  return response.choices[0].message.content;
+}
+
+/**
+ * Generate text using Google Gemini
+ * @param {string} prompt - The prompt to send to the AI
+ * @param {string} systemMessage - System message for context
+ * @returns {Promise<string>} Generated text
+ */
+async function generateTextWithGemini(prompt, systemMessage) {
+  if (!gemini) {
+    throw new Error('Gemini is not configured');
+  }
+
+  const model = gemini.getGenerativeModel({ 
+    model: process.env.GEMINI_MODEL || 'gemini-1.5-flash',
+    systemInstruction: systemMessage
+  });
+
+  const result = await model.generateContent(prompt);
+  const response = result.response;
+  return response.text();
+}
+
+/**
+ * Determine if an error is retryable with a different provider
+ * @param {Error} error - The error to check
+ * @returns {boolean} True if the error suggests trying another provider
+ */
+function isRetryableError(error) {
+  // OpenAI quota exceeded (429) or rate limit errors
+  if (error.status === 429) return true;
+  
+  // OpenAI service unavailable errors
+  if (error.status === 503 || error.status === 502) return true;
+  
+  // Gemini quota errors
+  if (error.message && error.message.includes('quota')) return true;
+  if (error.message && error.message.includes('RESOURCE_EXHAUSTED')) return true;
+  
+  // Network or timeout errors
+  if (error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') return true;
+  
+  return false;
+}
+
+/**
+ * Generate text using AI providers with automatic fallback
+ * @param {string} prompt - The prompt to send to the AI
+ * @param {string} systemMessage - System message for context
+ * @returns {Promise<string>} Generated text
+ */
+export async function generateText(prompt, systemMessage = 'You are a helpful assistant specialized in professional career documents.') {
+  if (!hasAnyProvider) {
+    throw new ApiError(500, 'No AI provider is configured. Please set at least one API key (OPENAI_API_KEY or GEMINI_API_KEY).');
+  }
+
+  const errors = [];
+  
+  // Try each provider in order of priority
+  for (const provider of providerPriority) {
+    try {
+      let result;
+      
+      switch (provider.toLowerCase()) {
+        case 'openai':
+          if (!openai) {
+            console.log('⚠️  OpenAI not configured, skipping...');
+            continue;
+          }
+          console.log('🤖 Attempting generation with OpenAI...');
+          result = await generateTextWithOpenAI(prompt, systemMessage);
+          console.log('✅ Successfully generated text with OpenAI');
+          break;
+          
+        case 'gemini':
+          if (!gemini) {
+            console.log('⚠️  Gemini not configured, skipping...');
+            continue;
+          }
+          console.log('🤖 Attempting generation with Gemini...');
+          result = await generateTextWithGemini(prompt, systemMessage);
+          console.log('✅ Successfully generated text with Gemini');
+          break;
+          
+        default:
+          console.warn(`⚠️  Unknown provider: ${provider}`);
+          continue;
+      }
+      
+      return result;
+      
+    } catch (error) {
+      const errorMsg = `${provider} failed: ${error.message}`;
+      console.error(`❌ ${errorMsg}`);
+      errors.push({ provider, error: errorMsg, status: error.status });
+      
+      // If this is not a retryable error (e.g., auth error), don't try other providers
+      if (!isRetryableError(error)) {
+        // For auth errors, throw immediately
+        if (error.status === 401) {
+          throw new ApiError(401, `Invalid ${provider} API key`);
+        }
+        // For other non-retryable errors, continue to next provider
+        console.log(`⚠️  Non-retryable error, trying next provider...`);
+      } else {
+        console.log(`⚠️  Retryable error (${error.status || error.code}), trying next provider...`);
+      }
+    }
+  }
+  
+  // All providers failed
+  const errorDetails = errors.map(e => `${e.provider}: ${e.error}`).join('; ');
+  console.error('❌ All AI providers failed:', errorDetails);
+  throw new ApiError(500, `All AI providers failed. ${errors.length > 0 ? 'Last error: ' + errors[errors.length - 1].error : 'No providers available.'}`);
 }
 
 /**

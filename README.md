@@ -17,6 +17,7 @@
 - 💼 **Cover Letter Generator**: Generate tailored cover letters for specific job applications
 - 🌐 **Portfolio Generator**: Build a beautiful HTML portfolio webpage showcasing your projects
 - 🤖 **AI-Powered**: Leverages OpenAI's GPT models for intelligent content generation
+- 🔄 **AI Provider Fallback**: Automatic fallback to alternative AI providers (Gemini) when OpenAI quota is exceeded
 - 🎨 **Modern UI**: Clean and intuitive React-based user interface with enhanced template selection
 - 📥 **Export Options**: Copy to clipboard or download generated content
 
@@ -24,7 +25,8 @@
 
 ### Backend
 - **Node.js** with Express.js
-- **OpenAI API** for AI-powered content generation
+- **OpenAI API** for AI-powered content generation (Primary)
+- **Google Gemini API** for AI fallback support (Optional)
 - RESTful API architecture
 - CORS enabled for cross-origin requests
 
@@ -88,15 +90,28 @@ HireMind/
    
    **Important:** The `.env.example` file is only a template. You must create your own `.env` file for the application to work. The `.env` file is git-ignored for security and should never be committed to version control.
 
-4. Configure your `.env` file with your OpenAI API key:
+4. Configure your `.env` file with your AI API keys:
    ```env
    PORT=3001
    NODE_ENV=development
+   
+   # Primary AI Provider (OpenAI)
    OPENAI_API_KEY=your_openai_api_key_here
    OPENAI_MODEL=gpt-3.5-turbo
+   
+   # Fallback AI Provider (Gemini) - Optional but recommended
+   GEMINI_API_KEY=your_gemini_api_key_here
+   GEMINI_MODEL=gemini-1.5-flash
+   
+   # AI Provider Priority (optional, default: openai,gemini)
+   # AI_PROVIDER_PRIORITY=openai,gemini
    ```
    
-   **Note:** Replace `your_openai_api_key_here` with your actual OpenAI API key from https://platform.openai.com/api-keys
+   **Note:** 
+   - Replace `your_openai_api_key_here` with your actual OpenAI API key from https://platform.openai.com/api-keys
+   - Replace `your_gemini_api_key_here` with your actual Gemini API key from https://aistudio.google.com/app/apikey
+   - You need at least one AI provider configured for the app to work
+   - Configure multiple providers for automatic fallback when one provider is unavailable or exceeds quota
 
 5. Start the backend server:
    ```bash
@@ -292,11 +307,18 @@ Create a `.env` file in the `backend/` directory with the following variables:
 |----------|-------------|---------|----------|
 | `PORT` | Server port | 3001 | No |
 | `NODE_ENV` | Environment (development/production) | development | No |
-| `OPENAI_API_KEY` | Your OpenAI API key | - | **Yes** |
+| `OPENAI_API_KEY` | Your OpenAI API key (Primary Provider) | - | At least one AI provider required |
 | `OPENAI_MODEL` | GPT model to use | gpt-3.5-turbo | No |
+| `GEMINI_API_KEY` | Your Google Gemini API key (Fallback Provider) | - | Optional (recommended) |
+| `GEMINI_MODEL` | Gemini model to use | gemini-1.5-flash | No |
+| `AI_PROVIDER_PRIORITY` | Comma-separated list of provider priority | openai,gemini | No |
 
 **Note:** 
-- The backend will display a warning if `OPENAI_API_KEY` is not set, and AI features will not work until configured.
+- You must configure at least one AI provider (OpenAI or Gemini) for the app to work.
+- Configure multiple AI providers for automatic fallback when quota is exceeded or a provider is unavailable.
+- The system will try providers in the order specified by `AI_PROVIDER_PRIORITY` (default: openai → gemini).
+- Get OpenAI API keys from https://platform.openai.com/api-keys
+- Get Gemini API keys from https://aistudio.google.com/app/apikey
 - Environment variables are loaded using the `-r dotenv/config` flag when starting the server, ensuring they're available before any application code runs.
 - The `.env` file is git-ignored and should never be committed to version control.
 
@@ -334,21 +356,108 @@ npm run build  # Creates optimized production build in dist/
 npm run preview  # Preview production build locally
 ```
 
+## AI Provider Fallback System
+
+HireMind includes an intelligent AI provider fallback system that automatically switches to alternative AI providers when the primary provider is unavailable or exceeds quota limits.
+
+### How It Works
+
+1. **Priority-Based Execution**: The system tries AI providers in order of priority (default: OpenAI → Gemini)
+2. **Automatic Failover**: If a provider fails with quota (429), rate limit, or availability errors, the system automatically tries the next configured provider
+3. **Transparent Logging**: Each request logs which provider was used, making debugging and monitoring easier
+4. **User-Friendly Errors**: Users only see an error if all configured providers fail
+
+### Configuration
+
+Configure provider priority using the `AI_PROVIDER_PRIORITY` environment variable:
+
+```env
+# Try OpenAI first, then fall back to Gemini
+AI_PROVIDER_PRIORITY=openai,gemini
+
+# Or reverse the order
+AI_PROVIDER_PRIORITY=gemini,openai
+```
+
+### Supported Providers
+
+| Provider | API Key Variable | Model Variable | Get API Key |
+|----------|-----------------|----------------|-------------|
+| OpenAI | `OPENAI_API_KEY` | `OPENAI_MODEL` | https://platform.openai.com/api-keys |
+| Google Gemini | `GEMINI_API_KEY` | `GEMINI_MODEL` | https://aistudio.google.com/app/apikey |
+
+### Error Handling
+
+The system automatically retries with the next provider for:
+- **429 errors**: Quota exceeded or rate limit errors
+- **503/502 errors**: Service temporarily unavailable
+- **Quota errors**: Provider-specific quota messages
+- **Network errors**: Connection timeouts or refused connections
+
+**Non-retryable errors** (throws immediately):
+- **401 errors**: Invalid API key - Fix your configuration
+
+### Best Practices
+
+1. **Configure Multiple Providers**: Set up at least 2 providers for maximum reliability
+2. **Monitor Logs**: Check console output to see which provider handles each request
+3. **Balance Usage**: Consider alternating priority to distribute usage across providers
+4. **Free Tier Friendly**: Use Gemini as fallback to avoid OpenAI quota limits during development
+
+### Example Console Output
+
+```
+✅ AI providers configured: OpenAI, Gemini
+📋 Provider priority: openai → gemini
+🚀 HireMind API server running on port 3001
+🤖 Attempting generation with OpenAI...
+❌ OpenAI failed: Request failed with status code 429
+⚠️  Retryable error (429), trying next provider...
+🤖 Attempting generation with Gemini...
+✅ Successfully generated text with Gemini
+```
+
 ## Troubleshooting
 
-### "OpenAI API key is not configured"
-This warning appears when the `OPENAI_API_KEY` is not found in your environment variables.
+### "No AI provider API keys configured"
+This warning appears when neither `OPENAI_API_KEY` nor `GEMINI_API_KEY` is set in your environment variables.
 
 **Solution:**
 1. Ensure you've created a `.env` file (not `.env.example`) in the `backend/` directory
-2. Add your actual OpenAI API key to the `.env` file:
+2. Add at least one AI provider API key to the `.env` file:
    ```env
+   # Option 1: OpenAI only
    OPENAI_API_KEY=sk-your-actual-key-here
+   OPENAI_MODEL=gpt-3.5-turbo
+   
+   # Option 2: Gemini only
+   GEMINI_API_KEY=your-gemini-key-here
+   GEMINI_MODEL=gemini-1.5-flash
+   
+   # Option 3: Both (Recommended)
+   OPENAI_API_KEY=sk-your-actual-key-here
+   GEMINI_API_KEY=your-gemini-key-here
    ```
 3. **Important:** Restart the backend server completely after creating/modifying the `.env` file
 4. Verify the `.env` file is in the correct location (`backend/.env`, not root directory)
 
 **Note:** The `.env.example` file is only a template and is NOT loaded by the application. You must create your own `.env` file.
+
+### "All AI providers failed"
+This error occurs when all configured AI providers fail to generate content.
+
+**Common Causes:**
+1. **Invalid API Keys**: Check that your API keys are correct and active
+2. **Quota Exceeded on All Providers**: All providers have reached their quota limits
+3. **Network Issues**: Cannot connect to AI provider APIs
+
+**Solution:**
+1. Verify your API keys are valid and not expired
+2. Check your quota/usage limits on provider dashboards:
+   - OpenAI: https://platform.openai.com/usage
+   - Gemini: https://aistudio.google.com/
+3. If one provider is out of quota, the system should automatically use the other - ensure both are configured
+4. Check backend console logs for specific error messages from each provider
 
 ### "Failed to fetch" errors
 
