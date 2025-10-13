@@ -7,10 +7,11 @@
 - 📝 **Resume Generator**: Create ATS-friendly professional resumes based on your experience and skills
   - **Multiple Templates**: Choose from modern, classic, or minimal designs with visual card-based selection
   - **Job Description Upload**: Upload or paste job descriptions (PDF, DOCX, TXT) for targeted resume creation
-  - **Resume Upload**: Upload existing resumes to extract and pre-fill information
+  - **Resume Upload & AI Parsing**: Upload existing resumes (PDF, DOCX, TXT) and automatically extract structured data using AI
+  - **Session-Based Storage**: Uploaded resume data persists in session for easy reuse across multiple comparisons
   - **AI-Powered Tailoring**: Generate resumes tailored to specific job descriptions with keyword optimization
-  - **Smart Suggestions**: Get AI recommendations for missing skills, keywords, and improvements
-  - **Resume Comparison**: Compare your resume against job descriptions with match scoring
+  - **Smart Suggestions**: Get AI recommendations for missing skills, keywords, and improvements based on actual resume content
+  - **Resume Comparison**: Compare your resume against job descriptions with match scoring using real parsed data
   - **HTML Export**: Download resumes as formatted HTML files
   - **PDF Export**: Print directly to PDF from browser
   - **Template Customization**: Easy to add new templates
@@ -174,6 +175,34 @@ HireMind offers three professional resume templates:
 - **Minimal Sidebar**: Clean two-column design with dark sidebar (ATS Score: 8/10)
 
 See [TEMPLATES.md](./TEMPLATES.md) for detailed template documentation and instructions for adding new templates.
+
+## Testing
+
+### Running Tests
+
+The backend includes comprehensive tests for JSON repair and resume data validation:
+
+```bash
+cd backend
+npm test
+```
+
+### Manual Testing
+
+For detailed manual testing of the resume upload and parsing feature, including step-by-step test scenarios and validation checklists, see the manual test guide in `/tmp/MANUAL_TEST_GUIDE.md`.
+
+Sample test files:
+- `/tmp/sample_resume.txt` - Complete resume example
+- `/tmp/sample_job_description.txt` - Job description for testing comparisons
+
+Key test scenarios:
+1. Upload and parse resume (PDF, DOCX, TXT)
+2. Verify structured data extraction (name, email, skills, experience, education)
+3. Check session persistence across requests
+4. Compare uploaded resume with job description
+5. Verify comparison uses actual resume data (not blank template)
+6. Test clear/replace resume functionality
+7. Validate error handling for empty or invalid files
 
 ## API Endpoints
 
