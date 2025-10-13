@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{name}} - Resume</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Helvetica Neue', 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            background: #ecf0f1;
+        }
+        
+        .container {
+            max-width: 850px;
+            margin: 20px auto;
+            background: white;
+            display: flex;
+            box-shadow: 0 0 30px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar {
+            width: 35%;
+            background: #34495e;
+            color: white;
+            padding: 40px 30px;
+        }
+        
+        .sidebar h1 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+        
+        .sidebar .contact-info {
+            margin-top: 30px;
+            font-size: 0.85em;
+            line-height: 2;
+        }
+        
+        .sidebar .contact-info div {
+            margin-bottom: 8px;
+            word-wrap: break-word;
+        }
+        
+        .sidebar .section {
+            margin-top: 35px;
+        }
+        
+        .sidebar .section-title {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #5d6d7e;
+            font-weight: 400;
+        }
+        
+        .sidebar .skills {
+            font-size: 0.9em;
+        }
+        
+        .sidebar .skill-tag {
+            display: block;
+            padding: 8px 0;
+            color: #ecf0f1;
+        }
+        
+        .main-content {
+            width: 65%;
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 1.4em;
+            color: #34495e;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #34495e;
+            font-weight: 600;
+        }
+        
+        .summary {
+            color: #555;
+            line-height: 1.8;
+            text-align: justify;
+        }
+        
+        .experience-item, .education-item {
+            margin-bottom: 25px;
+        }
+        
+        .item-title {
+            font-size: 1.15em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .item-subtitle {
+            color: #7f8c8d;
+            font-size: 0.95em;
+            margin-bottom: 5px;
+        }
+        
+        .item-duration {
+            color: #95a5a6;
+            font-size: 0.85em;
+            font-style: italic;
+            margin-bottom: 8px;
+        }
+        
+        .item-description {
+            color: #555;
+            line-height: 1.7;
+            text-align: justify;
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            .container {
+                box-shadow: none;
+                margin: 0;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar, .main-content {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h1>{{name}}</h1>
+            
+            <div class="contact-info">
+                {{#if email}}<div>✉ {{email}}</div>{{/if}}
+                {{#if phone}}<div>📞 {{phone}}</div>{{/if}}
+                {{#if location}}<div>📍 {{location}}</div>{{/if}}
+            </div>
+            
+            {{#if skills}}
+            <div class="section">
+                <h2 class="section-title">Skills</h2>
+                <div class="skills">
+                    {{#each skills}}
+                    <div class="skill-tag">• {{this}}</div>
+                    {{/each}}
+                </div>
+            </div>
+            {{/if}}
+        </div>
+        
+        <div class="main-content">
+            {{#if summary}}
+            <div class="section">
+                <h2 class="section-title">About Me</h2>
+                <p class="summary">{{summary}}</p>
+            </div>
+            {{/if}}
+            
+            {{#if experience}}
+            <div class="section">
+                <h2 class="section-title">Experience</h2>
+                {{#each experience}}
+                <div class="experience-item">
+                    <div class="item-title">{{position}}</div>
+                    <div class="item-subtitle">{{company}}</div>
+                    <div class="item-duration">{{duration}}</div>
+                    {{#if description}}
+                    <div class="item-description">{{description}}</div>
+                    {{/if}}
+                </div>
+                {{/each}}
+            </div>
+            {{/if}}
+            
+            {{#if education}}
+            <div class="section">
+                <h2 class="section-title">Education</h2>
+                {{#each education}}
+                <div class="education-item">
+                    <div class="item-title">{{degree}}</div>
+                    <div class="item-subtitle">{{institution}}</div>
+                    <div class="item-duration">{{year}}</div>
+                </div>
+                {{/each}}
+            </div>
+            {{/if}}
+        </div>
+    </div>
+</body>
+</html>

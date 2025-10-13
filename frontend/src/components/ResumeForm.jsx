@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './ResumeForm.css';
+import { api } from '../services/api.js';
 
 function ResumeForm({ onGenerate, loading }) {
   const [formData, setFormData] = useState({
@@ -11,7 +12,27 @@ function ResumeForm({ onGenerate, loading }) {
     skills: '',
     experience: [{ position: '', company: '', duration: '', description: '' }],
     education: [{ degree: '', institution: '', year: '' }],
+    template: 'modern',
   });
+  
+  const [templates, setTemplates] = useState([
+    { id: 'modern', name: 'Modern Professional', description: 'Loading...' },
+    { id: 'classic', name: 'Classic ATS', description: 'Loading...' },
+    { id: 'minimal', name: 'Minimal Sidebar', description: 'Loading...' },
+  ]);
+  
+  useEffect(() => {
+    // Fetch available templates
+    api.getResumeTemplates()
+      .then(response => {
+        if (response.success && response.data.templates) {
+          setTemplates(response.data.templates);
+        }
+      })
+      .catch(err => {
+        console.error('Failed to fetch templates:', err);
+      });
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -55,6 +76,26 @@ function ResumeForm({ onGenerate, loading }) {
 
   return (
     <form className="resume-form" onSubmit={handleSubmit}>
+      <h2>Select Template</h2>
+      <div className="form-group">
+        <label>Resume Template *</label>
+        <select
+          name="template"
+          value={formData.template}
+          onChange={handleInputChange}
+          required
+        >
+          {templates.map(template => (
+            <option key={template.id} value={template.id}>
+              {template.name} {template.recommended ? '⭐' : ''} - {template.description}
+            </option>
+          ))}
+        </select>
+        <small style={{ display: 'block', marginTop: '5px', color: '#666' }}>
+          ⭐ = Recommended for ATS compatibility
+        </small>
+      </div>
+      
       <h2>Personal Information</h2>
       <div className="form-group">
         <label>Name *</label>
