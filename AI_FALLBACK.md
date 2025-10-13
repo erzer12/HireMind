@@ -316,10 +316,10 @@ Fallback adds latency only when primary provider fails.
 
 ### Cost
 
-Provider pricing varies and is subject to change. Current pricing information:
+Provider pricing varies and is subject to change. For current pricing information:
 
-- **OpenAI**: Pay-per-use model, approximately $0.50-$1.50 per 1M input/output tokens for GPT-3.5-turbo. For current pricing, see https://openai.com/pricing
-- **Gemini**: Free tier available with rate limits, then pay-per-use. For current pricing, see https://ai.google.dev/pricing
+- **OpenAI**: Pay-per-use model with different rates for input and output tokens. See https://openai.com/pricing for GPT-3.5-turbo, GPT-4, and other model pricing
+- **Gemini**: Free tier available with rate limits, then pay-per-use. See https://ai.google.dev/pricing for current pricing
 
 **Important**: Always check official pricing pages for the most up-to-date information as rates and models evolve frequently.
 
