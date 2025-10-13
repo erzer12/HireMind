@@ -14,10 +14,34 @@ const TEMPLATES_DIR = path.join(__dirname, '../templates');
 function renderTemplate(template, data) {
   let result = template;
   
-  // Handle simple variables: {{variable}}
-  result = result.replace(/\{\{([^#\/\s}]+)\}\}/g, (match, key) => {
-    const value = data[key.trim()];
-    return value !== undefined && value !== null ? value : '';
+  // Handle arrays first: {{#each array}}...{{/each}}
+  result = result.replace(/\{\{#each\s+([^}]+)\}\}([\s\S]*?)\{\{\/each\}\}/g, (match, key, itemTemplate) => {
+    const array = data[key.trim()];
+    if (!Array.isArray(array) || array.length === 0) return '';
+    
+    return array.map(item => {
+      let itemResult = itemTemplate;
+      
+      // Replace {{this}} for simple values (e.g., skills array)
+      if (typeof item !== 'object') {
+        itemResult = itemResult.replace(/\{\{this\}\}/g, item);
+        return itemResult;
+      }
+      
+      // Handle nested conditionals in each loop first
+      itemResult = itemResult.replace(/\{\{#if\s+([^}]+)\}\}([\s\S]*?)\{\{\/if\}\}/g, (m, prop, content) => {
+        const value = item[prop.trim()];
+        return value ? content : '';
+      });
+      
+      // Replace {{property}} for object properties
+      itemResult = itemResult.replace(/\{\{([^#\/\s}]+)\}\}/g, (m, prop) => {
+        const value = item[prop.trim()];
+        return value !== undefined && value !== null ? value : '';
+      });
+      
+      return itemResult;
+    }).join('');
   });
   
   // Handle conditionals: {{#if variable}}...{{/if}}
@@ -26,33 +50,10 @@ function renderTemplate(template, data) {
     return value && (Array.isArray(value) ? value.length > 0 : true) ? content : '';
   });
   
-  // Handle arrays: {{#each array}}...{{/each}}
-  result = result.replace(/\{\{#each\s+([^}]+)\}\}([\s\S]*?)\{\{\/each\}\}/g, (match, key, itemTemplate) => {
-    const array = data[key.trim()];
-    if (!Array.isArray(array) || array.length === 0) return '';
-    
-    return array.map(item => {
-      let itemResult = itemTemplate;
-      
-      // Replace {{this}} for simple values
-      itemResult = itemResult.replace(/\{\{this\}\}/g, item);
-      
-      // Replace {{property}} for object properties
-      if (typeof item === 'object') {
-        itemResult = itemResult.replace(/\{\{([^#\/\s}]+)\}\}/g, (m, prop) => {
-          const value = item[prop.trim()];
-          return value !== undefined && value !== null ? value : '';
-        });
-        
-        // Handle nested conditionals in each loop
-        itemResult = itemResult.replace(/\{\{#if\s+([^}]+)\}\}([\s\S]*?)\{\{\/if\}\}/g, (m, prop, content) => {
-          const value = item[prop.trim()];
-          return value ? content : '';
-        });
-      }
-      
-      return itemResult;
-    }).join('');
+  // Handle simple variables: {{variable}} (last to avoid conflicts)
+  result = result.replace(/\{\{([^#\/\s}]+)\}\}/g, (match, key) => {
+    const value = data[key.trim()];
+    return value !== undefined && value !== null ? value : '';
   });
   
   return result;
