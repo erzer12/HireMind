@@ -186,18 +186,18 @@ npm test
 
 ### Manual Testing
 
-The application supports comprehensive manual testing of resume upload and parsing features. Sample test files are available in the `docs/samples/` directory:
-- [Sample Resume](docs/samples/sample_resume.txt) - Complete resume example
-- [Sample Job Description](docs/samples/sample_job_description.txt) - Job description for testing comparisons
+The application can be tested manually by:
+1. Starting both backend and frontend servers
+2. Using the sample test files available in `docs/samples/`:
+   - [Sample Resume](docs/samples/sample_resume.txt) - Complete resume example
+   - [Sample Job Description](docs/samples/sample_job_description.txt) - Job description for testing comparisons
 
-Key test scenarios:
-1. Upload and parse resume (PDF, DOCX, TXT)
-2. Verify structured data extraction (name, email, skills, experience, education)
-3. Check session persistence across requests
-4. Compare uploaded resume with job description
-5. Verify comparison uses actual resume data (not blank template)
-6. Test clear/replace resume functionality
-7. Validate error handling for empty or invalid files
+Test the following features:
+- Upload and parse resume files (PDF, DOCX, TXT)
+- Verify structured data extraction (name, email, skills, experience, education)
+- Compare uploaded resume with job description
+- Test form field population from uploaded resume
+- Validate error handling for invalid files
 
 ## API Endpoints
 
