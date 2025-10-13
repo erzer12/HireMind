@@ -5,14 +5,19 @@
 ## Features
 
 - 📝 **Resume Generator**: Create ATS-friendly professional resumes based on your experience and skills
-  - **Multiple Templates**: Choose from modern, classic, or minimal designs
+  - **Multiple Templates**: Choose from modern, classic, or minimal designs with visual card-based selection
+  - **Job Description Upload**: Upload or paste job descriptions (PDF, DOCX, TXT) for targeted resume creation
+  - **Resume Upload**: Upload existing resumes to extract and pre-fill information
+  - **AI-Powered Tailoring**: Generate resumes tailored to specific job descriptions with keyword optimization
+  - **Smart Suggestions**: Get AI recommendations for missing skills, keywords, and improvements
+  - **Resume Comparison**: Compare your resume against job descriptions with match scoring
   - **HTML Export**: Download resumes as formatted HTML files
   - **PDF Export**: Print directly to PDF from browser
   - **Template Customization**: Easy to add new templates
 - 💼 **Cover Letter Generator**: Generate tailored cover letters for specific job applications
 - 🌐 **Portfolio Generator**: Build a beautiful HTML portfolio webpage showcasing your projects
 - 🤖 **AI-Powered**: Leverages OpenAI's GPT models for intelligent content generation
-- 🎨 **Modern UI**: Clean and intuitive React-based user interface
+- 🎨 **Modern UI**: Clean and intuitive React-based user interface with enhanced template selection
 - 📥 **Export Options**: Copy to clipboard or download generated content
 
 ## Tech Stack
@@ -129,10 +134,16 @@ HireMind/
 1. **Start Both Servers**: Ensure both backend (port 3001) and frontend (port 5173) are running
 2. **Open the App**: Navigate to `http://localhost:5173` in your browser
 3. **Choose a Feature**: Select Resume, Cover Letter, or Portfolio from the navigation tabs
-4. **Select Template** (for resumes): Choose from Modern Professional, Classic ATS, or Minimal Sidebar designs
-5. **Fill the Form**: Enter your information in the provided fields
-6. **Generate Content**: Click the generate button and wait for AI to create your content
-7. **Export**: Copy to clipboard, download as HTML, or print to PDF
+4. **For Resume Creation**:
+   - **Select Template**: Choose from Modern Professional, Classic ATS, or Minimal Sidebar using the visual card selector
+   - **Upload Existing Resume (Optional)**: Upload your current resume (PDF, DOCX, TXT) to extract information
+   - **Add Job Description (Optional)**: Paste or upload a job description for AI-powered tailoring
+   - **Analyze Job Description**: Click "Analyze JD" to extract required skills and keywords
+   - **Compare Resume**: Click "Compare Resume" to get AI suggestions and match scoring
+   - **Fill the Form**: Enter or review your information in the provided fields
+   - **Generate**: Click the generate button - if a job description is provided, you'll get a tailored resume
+5. **Review AI Suggestions**: Review missing skills, keyword recommendations, and improvement suggestions
+6. **Export**: Copy to clipboard, download as HTML, or print to PDF
 
 ### Resume Templates
 
@@ -195,6 +206,40 @@ See [TEMPLATES.md](./TEMPLATES.md) for detailed template documentation and instr
     }
   }
   ```
+
+- **POST** `/api/resume/tailored` - Generate a tailored resume based on job description
+  ```json
+  {
+    "template": "modern",
+    "jobDescription": "We are seeking a senior developer...",
+    "name": "John Doe",
+    "email": "john@example.com",
+    ...
+  }
+  ```
+
+- **POST** `/api/resume/parse` - Parse uploaded resume file
+  - Content-Type: `multipart/form-data`
+  - Field: `file` (PDF, DOCX, or TXT)
+  - Returns extracted text from resume
+
+- **POST** `/api/resume/analyze-jd` - Analyze job description
+  - Option 1: JSON body with `jobDescription` field
+  - Option 2: multipart/form-data with `file` field
+  - Returns: required skills, preferred skills, keywords, experience level
+
+- **POST** `/api/resume/compare` - Compare resume with job description
+  ```json
+  {
+    "resumeData": {
+      "name": "John Doe",
+      "skills": ["JavaScript", "React"],
+      ...
+    },
+    "jobDescription": "We are seeking..."
+  }
+  ```
+  - Returns: match score, missing skills, suggestions, improvements
 
 ### Cover Letter
 - **POST** `/api/cover-letter` - Generate a cover letter

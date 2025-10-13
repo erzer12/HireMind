@@ -124,4 +124,112 @@ export const api = {
       handleFetchError(error);
     }
   },
+
+  /**
+   * Parse uploaded resume file
+   */
+  async parseResume(file) {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch(`${API_BASE_URL}/resume/parse`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to parse resume');
+      }
+
+      return response.json();
+    } catch (error) {
+      handleFetchError(error);
+    }
+  },
+
+  /**
+   * Analyze job description
+   */
+  async analyzeJobDescription(jobDescription, file = null) {
+    try {
+      let response;
+
+      if (file) {
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        response = await fetch(`${API_BASE_URL}/resume/analyze-jd`, {
+          method: 'POST',
+          body: formData,
+        });
+      } else {
+        response = await fetch(`${API_BASE_URL}/resume/analyze-jd`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ jobDescription }),
+        });
+      }
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to analyze job description');
+      }
+
+      return response.json();
+    } catch (error) {
+      handleFetchError(error);
+    }
+  },
+
+  /**
+   * Compare resume with job description
+   */
+  async compareResumeWithJD(resumeData, jobDescription) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/resume/compare`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ resumeData, jobDescription }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to compare resume');
+      }
+
+      return response.json();
+    } catch (error) {
+      handleFetchError(error);
+    }
+  },
+
+  /**
+   * Generate tailored resume based on job description
+   */
+  async generateTailoredResume(userInfo, jobDescription, template = 'modern') {
+    try {
+      const response = await fetch(`${API_BASE_URL}/resume/tailored`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ...userInfo, jobDescription, template }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to generate tailored resume');
+      }
+
+      return response.json();
+    } catch (error) {
+      handleFetchError(error);
+    }
+  },
 };

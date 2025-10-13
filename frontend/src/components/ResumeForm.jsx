@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import './ResumeForm.css';
 import { api } from '../services/api.js';
+import TemplateSelector from './TemplateSelector';
 
 function ResumeForm({ onGenerate, loading }) {
   const [formData, setFormData] = useState({
@@ -16,10 +17,18 @@ function ResumeForm({ onGenerate, loading }) {
   });
   
   const [templates, setTemplates] = useState([
-    { id: 'modern', name: 'Modern Professional', description: 'Loading...' },
-    { id: 'classic', name: 'Classic ATS', description: 'Loading...' },
-    { id: 'minimal', name: 'Minimal Sidebar', description: 'Loading...' },
+    { id: 'modern', name: 'Modern Professional', description: 'Loading...', atsScore: 9, recommended: true },
+    { id: 'classic', name: 'Classic ATS', description: 'Loading...', atsScore: 10, recommended: true },
+    { id: 'minimal', name: 'Minimal Sidebar', description: 'Loading...', atsScore: 8, recommended: false },
   ]);
+
+  const [jobDescription, setJobDescription] = useState('');
+  const [jdAnalysis, setJdAnalysis] = useState(null);
+  const [suggestions, setSuggestions] = useState(null);
+  const [uploadingResume, setUploadingResume] = useState(false);
+  const [uploadingJD, setUploadingJD] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   
   useEffect(() => {
     // Fetch available templates
@@ -71,30 +80,287 @@ function ResumeForm({ onGenerate, loading }) {
       ...formData,
       skills: formData.skills.split(',').map(s => s.trim()).filter(s => s),
     };
-    onGenerate(dataToSend);
+    
+    // If job description provided, use tailored resume generation
+    if (jobDescription.trim()) {
+      dataToSend.jobDescription = jobDescription;
+      // Call parent with a flag indicating this is tailored
+      onGenerate(dataToSend, true);
+    } else {
+      onGenerate(dataToSend, false);
+    }
+  };
+
+  const handleResumeUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploadingResume(true);
+    try {
+      const response = await api.parseResume(file);
+      if (response.success) {
+        alert('Resume uploaded successfully! Text extracted:\n\n' + response.data.text.substring(0, 200) + '...\n\nYou can now manually fill in the form fields.');
+        // Note: In a production app, you'd want to use AI to parse the extracted text into structured data
+      }
+    } catch (error) {
+      alert('Failed to upload resume: ' + error.message);
+    } finally {
+      setUploadingResume(false);
+    }
+  };
+
+  const handleJDUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploadingJD(true);
+    try {
+      const response = await api.analyzeJobDescription(null, file);
+      if (response.success) {
+        setJobDescription(response.data.originalText);
+        setJdAnalysis(response.data.analysis);
+        setShowSuggestions(true);
+      }
+    } catch (error) {
+      alert('Failed to upload job description: ' + error.message);
+    } finally {
+      setUploadingJD(false);
+    }
+  };
+
+  const handleAnalyzeJD = async () => {
+    if (!jobDescription.trim()) {
+      alert('Please enter a job description first');
+      return;
+    }
+
+    setAnalyzing(true);
+    try {
+      const response = await api.analyzeJobDescription(jobDescription);
+      if (response.success) {
+        setJdAnalysis(response.data.analysis);
+        setShowSuggestions(true);
+      }
+    } catch (error) {
+      alert('Failed to analyze job description: ' + error.message);
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+
+  const handleCompareWithJD = async () => {
+    if (!jobDescription.trim()) {
+      alert('Please enter a job description first');
+      return;
+    }
+
+    setAnalyzing(true);
+    try {
+      const resumeData = {
+        ...formData,
+        skills: formData.skills.split(',').map(s => s.trim()).filter(s => s),
+      };
+      const response = await api.compareResumeWithJD(resumeData, jobDescription);
+      if (response.success) {
+        setSuggestions(response.data.suggestions);
+        setShowSuggestions(true);
+      }
+    } catch (error) {
+      alert('Failed to compare resume: ' + error.message);
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+
+  const handleTemplateSelect = (templateId) => {
+    setFormData({ ...formData, template: templateId });
   };
 
   return (
     <form className="resume-form" onSubmit={handleSubmit}>
-      <h2>Select Template</h2>
-      <div className="form-group">
-        <label>Resume Template *</label>
-        <select
-          name="template"
-          value={formData.template}
-          onChange={handleInputChange}
-          required
-        >
-          {templates.map(template => (
-            <option key={template.id} value={template.id}>
-              {template.name} {template.recommended ? '⭐' : ''} - {template.description}
-            </option>
-          ))}
-        </select>
-        <small style={{ display: 'block', marginTop: '5px', color: '#666' }}>
-          ⭐ = Recommended for ATS compatibility
-        </small>
+      <TemplateSelector 
+        templates={templates}
+        selectedTemplate={formData.template}
+        onSelect={handleTemplateSelect}
+      />
+
+      <h2>Upload Existing Resume (Optional)</h2>
+      <div className="form-group upload-section">
+        <p className="upload-description">
+          Upload your existing resume to extract information (PDF, DOCX, or TXT)
+        </p>
+        <div className="file-upload-wrapper">
+          <input
+            type="file"
+            id="resume-upload"
+            accept=".pdf,.docx,.txt"
+            onChange={handleResumeUpload}
+            disabled={uploadingResume}
+            className="file-input"
+          />
+          <label htmlFor="resume-upload" className="file-upload-button">
+            {uploadingResume ? '⏳ Uploading...' : '📄 Upload Resume'}
+          </label>
+        </div>
       </div>
+
+      <h2>Job Description (Optional for Tailored Resume)</h2>
+      <div className="form-group">
+        <p className="upload-description">
+          Add a job description to create a tailored resume with AI-powered suggestions
+        </p>
+        <textarea
+          name="jobDescription"
+          value={jobDescription}
+          onChange={(e) => setJobDescription(e.target.value)}
+          rows="6"
+          placeholder="Paste the job description here..."
+          className="job-description-textarea"
+        />
+        <div className="jd-actions">
+          <div className="file-upload-wrapper">
+            <input
+              type="file"
+              id="jd-upload"
+              accept=".pdf,.docx,.txt"
+              onChange={handleJDUpload}
+              disabled={uploadingJD}
+              className="file-input"
+            />
+            <label htmlFor="jd-upload" className="file-upload-button secondary">
+              {uploadingJD ? '⏳ Uploading...' : '📎 Upload JD File'}
+            </label>
+          </div>
+          <button
+            type="button"
+            onClick={handleAnalyzeJD}
+            disabled={analyzing || !jobDescription.trim()}
+            className="analyze-button"
+          >
+            {analyzing ? '🔄 Analyzing...' : '🔍 Analyze JD'}
+          </button>
+          <button
+            type="button"
+            onClick={handleCompareWithJD}
+            disabled={analyzing || !jobDescription.trim()}
+            className="analyze-button"
+          >
+            {analyzing ? '🔄 Comparing...' : '📊 Compare Resume'}
+          </button>
+        </div>
+      </div>
+
+      {showSuggestions && (jdAnalysis || suggestions) && (
+        <div className="suggestions-panel">
+          <div className="suggestions-header">
+            <h3>💡 AI Suggestions</h3>
+            <button
+              type="button"
+              onClick={() => setShowSuggestions(false)}
+              className="close-suggestions"
+            >
+              ✕
+            </button>
+          </div>
+          
+          {jdAnalysis && (
+            <div className="analysis-section">
+              <h4>Job Description Analysis</h4>
+              <div className="analysis-grid">
+                {jdAnalysis.requiredSkills && jdAnalysis.requiredSkills.length > 0 && (
+                  <div className="analysis-item">
+                    <strong>Required Skills:</strong>
+                    <div className="skill-tags">
+                      {jdAnalysis.requiredSkills.map((skill, idx) => (
+                        <span key={idx} className="skill-tag required">{skill}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {jdAnalysis.preferredSkills && jdAnalysis.preferredSkills.length > 0 && (
+                  <div className="analysis-item">
+                    <strong>Preferred Skills:</strong>
+                    <div className="skill-tags">
+                      {jdAnalysis.preferredSkills.map((skill, idx) => (
+                        <span key={idx} className="skill-tag preferred">{skill}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {jdAnalysis.keywords && jdAnalysis.keywords.length > 0 && (
+                  <div className="analysis-item">
+                    <strong>Keywords to Include:</strong>
+                    <div className="skill-tags">
+                      {jdAnalysis.keywords.map((keyword, idx) => (
+                        <span key={idx} className="skill-tag keyword">{keyword}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {suggestions && (
+            <div className="suggestions-section">
+              <h4>Resume Comparison Results</h4>
+              <div className="match-score">
+                <span className="score-label">Match Score:</span>
+                <span className={`score-value ${suggestions.matchScore >= 70 ? 'good' : suggestions.matchScore >= 50 ? 'medium' : 'low'}`}>
+                  {suggestions.matchScore}%
+                </span>
+              </div>
+              
+              {suggestions.missingSkills && suggestions.missingSkills.length > 0 && (
+                <div className="suggestion-item">
+                  <strong>⚠️ Missing Skills:</strong>
+                  <div className="skill-tags">
+                    {suggestions.missingSkills.map((skill, idx) => (
+                      <span key={idx} className="skill-tag missing">{skill}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {suggestions.suggestedSkills && suggestions.suggestedSkills.length > 0 && (
+                <div className="suggestion-item">
+                  <strong>✨ Suggested Skills to Add:</strong>
+                  <div className="skill-tags">
+                    {suggestions.suggestedSkills.map((skill, idx) => (
+                      <span key={idx} className="skill-tag suggested">{skill}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {suggestions.strengths && suggestions.strengths.length > 0 && (
+                <div className="suggestion-item">
+                  <strong>✅ Strengths:</strong>
+                  <ul className="suggestion-list">
+                    {suggestions.strengths.map((strength, idx) => (
+                      <li key={idx}>{strength}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {suggestions.summaryImprovements && (
+                <div className="suggestion-item">
+                  <strong>📝 Summary Improvements:</strong>
+                  <p className="improvement-text">{suggestions.summaryImprovements}</p>
+                </div>
+              )}
+
+              {suggestions.overallFeedback && (
+                <div className="suggestion-item">
+                  <strong>💬 Overall Feedback:</strong>
+                  <p className="improvement-text">{suggestions.overallFeedback}</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
       
       <h2>Personal Information</h2>
       <div className="form-group">
