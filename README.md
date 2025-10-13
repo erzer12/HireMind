@@ -525,6 +525,14 @@ This error indicates that the frontend cannot connect to the backend API server.
 - If port 3001 or 5173 is in use, change the port in `.env` files
 - Update the frontend `VITE_API_URL` if you change the backend port
 
+## Documentation
+
+For detailed information about specific features and systems:
+
+- **[AI_FALLBACK.md](./AI_FALLBACK.md)** - AI provider fallback system, configuration, and error handling
+- **[JSON_ERROR_HANDLING.md](./JSON_ERROR_HANDLING.md)** - Robust JSON parsing and error handling for AI responses
+- **[TEMPLATES.md](./TEMPLATES.md)** - Guide for creating and adding new resume templates
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.

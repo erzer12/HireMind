@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { jsonrepair } from 'jsonrepair';
 import { ApiError } from '../middleware/errorHandler.js';
 
 // Helper to strip code block formatting from AI responses
@@ -7,6 +8,42 @@ function stripCodeBlock(s) {
   if (typeof s !== 'string') return s;
   // Remove triple backticks with optional language (e.g., ```json or ```)
   return s.trim().replace(/^```[a-z]*\n?/i, '').replace(/```$/, '').trim();
+}
+
+/**
+ * Parse JSON response from AI with robust error handling
+ * Logs raw response on error and attempts to repair malformed JSON
+ * @param {string} response - The raw AI response text
+ * @param {string} context - Context for logging (e.g., 'JD analysis', 'resume comparison')
+ * @returns {Object} Parsed JSON object
+ * @throws {ApiError} If JSON cannot be parsed even after repair attempts
+ */
+function parseAIJsonResponse(response, context = 'AI response') {
+  // First, strip code blocks
+  const cleaned = stripCodeBlock(response);
+  
+  try {
+    // Try direct parsing first (most efficient for valid JSON)
+    return JSON.parse(cleaned);
+  } catch (firstError) {
+    // Log the raw response for debugging
+    console.error(`⚠️  JSON parsing failed for ${context}. Raw response:`, response);
+    console.error(`First parse error: ${firstError.message}`);
+    
+    try {
+      // Attempt to repair the JSON
+      console.log(`🔧 Attempting to repair malformed JSON for ${context}...`);
+      const repaired = jsonrepair(cleaned);
+      const parsed = JSON.parse(repaired);
+      console.log(`✅ Successfully repaired and parsed JSON for ${context}`);
+      return parsed;
+    } catch (repairError) {
+      // Log repair failure with details
+      console.error(`❌ JSON repair failed for ${context}:`, repairError.message);
+      console.error('Cleaned response:', cleaned);
+      throw new ApiError(500, `Failed to parse ${context}: Invalid JSON format from AI provider. Please try again.`);
+    }
+  }
 }
 
 // Initialize OpenAI client if API key is available
@@ -286,20 +323,14 @@ Please provide a JSON response with the following structure:
   "qualifications": ["qualification1", "qualification2", ...]
 }
 
+IMPORTANT: Return ONLY valid, minified JSON. No code blocks, no comments, no trailing commas, no additional text.
 Focus on technical skills, tools, and relevant keywords that should appear in a resume.`;
 
-  const systemMessage = 'You are an expert at analyzing job descriptions and extracting key requirements. Always respond with valid JSON only, no additional text.';
+  const systemMessage = 'You are an expert at analyzing job descriptions and extracting key requirements. Always respond with valid, minified JSON only, no additional text or code blocks.';
   
   const response = await generateText(prompt, systemMessage);
   
-  try {
-    // Clean up code block formatting if present
-    const cleaned = stripCodeBlock(response);
-    return JSON.parse(cleaned);
-  } catch (error) {
-    console.error('Failed to parse JD analysis response:', error);
-    throw new ApiError(500, 'Failed to parse job description analysis');
-  }
+  return parseAIJsonResponse(response, 'job description analysis');
 }
 
 /**
@@ -330,20 +361,15 @@ Provide a JSON response with:
   "keywordsToAdd": ["keyword1", "keyword2", ...],
   "strengths": ["strength1", "strength2", ...],
   "overallFeedback": "Brief overall assessment"
-}`;
+}
 
-  const systemMessage = 'You are an expert resume coach and ATS optimization specialist. Provide actionable, specific suggestions. Always respond with valid JSON only.';
+IMPORTANT: Return ONLY valid, minified JSON. No code blocks, no comments, no trailing commas, no additional text.`;
+
+  const systemMessage = 'You are an expert resume coach and ATS optimization specialist. Provide actionable, specific suggestions. Always respond with valid, minified JSON only, no code blocks or additional text.';
   
   const response = await generateText(prompt, systemMessage);
   
-  try {
-    // Clean up code block formatting if present
-    const cleaned = stripCodeBlock(response);
-    return JSON.parse(cleaned);
-  } catch (error) {
-    console.error('Failed to parse resume comparison response:', error);
-    throw new ApiError(500, 'Failed to analyze resume comparison');
-  }
+  return parseAIJsonResponse(response, 'resume comparison');
 }
 
 /**
