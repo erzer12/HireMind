@@ -189,11 +189,11 @@ npm test
 
 ### Manual Testing
 
-For detailed manual testing of the resume upload and parsing feature, including step-by-step test scenarios and validation checklists, see the manual test guide in `/tmp/MANUAL_TEST_GUIDE.md`.
+For detailed manual testing of the resume upload and parsing feature, including step-by-step test scenarios and validation checklists, see the [Manual Test Guide](docs/testing/MANUAL_TEST_GUIDE.md).
 
 Sample test files:
-- `/tmp/sample_resume.txt` - Complete resume example
-- `/tmp/sample_job_description.txt` - Job description for testing comparisons
+- [Sample Resume](docs/samples/sample_resume.txt) - Complete resume example
+- [Sample Job Description](docs/samples/sample_job_description.txt) - Job description for testing comparisons
 
 Key test scenarios:
 1. Upload and parse resume (PDF, DOCX, TXT)
