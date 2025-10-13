@@ -1,4 +1,4 @@
-import pdf from 'pdf-parse';
+import { PDFParse } from 'pdf-parse';
 import mammoth from 'mammoth';
 import { ApiError } from '../middleware/errorHandler.js';
 
@@ -9,7 +9,8 @@ import { ApiError } from '../middleware/errorHandler.js';
  */
 export async function parsePDF(fileBuffer) {
   try {
-    const data = await pdf(fileBuffer);
+    const pdfParse = new PDFParse();
+    const data = await pdfParse.parseBuffer(fileBuffer);
     return data.text;
   } catch (error) {
     console.error('PDF parsing error:', error);
