@@ -2,6 +2,13 @@ import OpenAI from 'openai';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { ApiError } from '../middleware/errorHandler.js';
 
+// Helper to strip code block formatting from AI responses
+function stripCodeBlock(s) {
+  if (typeof s !== 'string') return s;
+  // Remove triple backticks with optional language (e.g., ```json or ```)
+  return s.trim().replace(/^```[a-z]*\n?/i, '').replace(/```$/, '').trim();
+}
+
 // Initialize OpenAI client if API key is available
 const openai = process.env.OPENAI_API_KEY 
   ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
@@ -286,7 +293,9 @@ Focus on technical skills, tools, and relevant keywords that should appear in a 
   const response = await generateText(prompt, systemMessage);
   
   try {
-    return JSON.parse(response);
+    // Clean up code block formatting if present
+    const cleaned = stripCodeBlock(response);
+    return JSON.parse(cleaned);
   } catch (error) {
     console.error('Failed to parse JD analysis response:', error);
     throw new ApiError(500, 'Failed to parse job description analysis');
@@ -328,7 +337,9 @@ Provide a JSON response with:
   const response = await generateText(prompt, systemMessage);
   
   try {
-    return JSON.parse(response);
+    // Clean up code block formatting if present
+    const cleaned = stripCodeBlock(response);
+    return JSON.parse(cleaned);
   } catch (error) {
     console.error('Failed to parse resume comparison response:', error);
     throw new ApiError(500, 'Failed to analyze resume comparison');
