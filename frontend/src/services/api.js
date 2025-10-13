@@ -4,6 +4,16 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
  * API client for HireMind backend
  */
 
+/**
+ * Helper function to handle fetch errors with better error messages
+ */
+const handleFetchError = (error) => {
+  if (error.message.includes('Failed to fetch') || error.name === 'TypeError') {
+    throw new Error(`Cannot connect to backend server at ${API_BASE_URL}. Please ensure the backend is running.`);
+  }
+  throw error;
+};
+
 export const api = {
   /**
    * Get available resume templates
@@ -19,10 +29,7 @@ export const api = {
       
       return response.json();
     } catch (error) {
-      if (error.message.includes('Failed to fetch') || error.name === 'TypeError') {
-        throw new Error('Cannot connect to backend server. Please ensure the backend is running on port 3001.');
-      }
-      throw error;
+      handleFetchError(error);
     }
   },
 
@@ -46,10 +53,7 @@ export const api = {
 
       return response.json();
     } catch (error) {
-      if (error.message.includes('Failed to fetch') || error.name === 'TypeError') {
-        throw new Error('Cannot connect to backend server. Please ensure the backend is running on port 3001.');
-      }
-      throw error;
+      handleFetchError(error);
     }
   },
 
@@ -73,10 +77,7 @@ export const api = {
 
       return response.json();
     } catch (error) {
-      if (error.message.includes('Failed to fetch') || error.name === 'TypeError') {
-        throw new Error('Cannot connect to backend server. Please ensure the backend is running on port 3001.');
-      }
-      throw error;
+      handleFetchError(error);
     }
   },
 
@@ -100,10 +101,7 @@ export const api = {
 
       return response.json();
     } catch (error) {
-      if (error.message.includes('Failed to fetch') || error.name === 'TypeError') {
-        throw new Error('Cannot connect to backend server. Please ensure the backend is running on port 3001.');
-      }
-      throw error;
+      handleFetchError(error);
     }
   },
 
@@ -113,12 +111,15 @@ export const api = {
   async healthCheck() {
     try {
       const response = await fetch(`${API_BASE_URL}/health`);
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Health check failed');
+      }
+      
       return response.json();
     } catch (error) {
-      if (error.message.includes('Failed to fetch') || error.name === 'TypeError') {
-        throw new Error('Cannot connect to backend server. Please ensure the backend is running on port 3001.');
-      }
-      throw error;
+      handleFetchError(error);
     }
   },
 };
