@@ -400,6 +400,168 @@ npm run build  # Creates optimized production build in dist/
 npm run preview  # Preview production build locally
 ```
 
+## Docker Deployment
+
+HireMind includes Docker support for easy, portable deployment to any platform that supports Docker containers.
+
+### Quick Start with Docker
+
+#### Using Docker Compose (Recommended)
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/erzer12/HireMind.git
+   cd HireMind
+   ```
+
+2. **Create your environment file**:
+   ```bash
+   cp .env.docker .env
+   ```
+
+3. **Edit `.env` and add your API keys**:
+   ```env
+   OPENAI_API_KEY=your_openai_api_key_here
+   GEMINI_API_KEY=your_gemini_api_key_here
+   SESSION_SECRET=your-secure-random-string
+   ```
+
+4. **Build and start the application**:
+   ```bash
+   docker-compose up -d
+   ```
+
+5. **Access the application**:
+   Open your browser and navigate to `http://localhost:3001`
+
+#### Using Docker CLI
+
+1. **Build the Docker image**:
+   ```bash
+   docker build -t hiremind .
+   ```
+
+2. **Run the container** with environment variables:
+   ```bash
+   docker run -d \
+     -p 3001:3001 \
+     -e OPENAI_API_KEY=your_openai_api_key_here \
+     -e GEMINI_API_KEY=your_gemini_api_key_here \
+     -e SESSION_SECRET=your-secure-random-string \
+     -e NODE_ENV=production \
+     --name hiremind \
+     hiremind
+   ```
+
+3. **Access the application**:
+   Open your browser and navigate to `http://localhost:3001`
+
+### Environment Variables for Docker
+
+The following environment variables can be set at runtime:
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `PORT` | No | 3001 | Port the server listens on |
+| `NODE_ENV` | No | production | Environment mode |
+| `SESSION_SECRET` | Yes | - | Secret for session encryption (generate a secure random string) |
+| `OPENAI_API_KEY` | Yes* | - | OpenAI API key for GPT models |
+| `OPENAI_MODEL` | No | gpt-3.5-turbo | OpenAI model to use |
+| `GEMINI_API_KEY` | Yes* | - | Google Gemini API key for fallback |
+| `GEMINI_MODEL` | No | gemini-2.5-flash | Gemini model to use |
+| `AI_PROVIDER_PRIORITY` | No | openai,gemini | Comma-separated provider priority |
+| `FRONTEND_URL` | No | http://localhost:3001 | CORS allowed origin |
+
+\* At least one AI provider API key (OpenAI or Gemini) is required
+
+### Docker Management Commands
+
+```bash
+# View logs
+docker-compose logs -f
+
+# Stop the application
+docker-compose down
+
+# Restart the application
+docker-compose restart
+
+# Rebuild after code changes
+docker-compose up -d --build
+
+# Check health status
+curl http://localhost:3001/api/health
+```
+
+### Platform-Specific Deployment
+
+#### Deploying to Render
+
+1. **Create a new Web Service** on [Render](https://render.com)
+2. **Connect your GitHub repository**
+3. **Configure the service**:
+   - **Environment**: Docker
+   - **Dockerfile Path**: `Dockerfile`
+   - **Port**: 3001
+4. **Add environment variables** in the Render dashboard:
+   - `OPENAI_API_KEY`
+   - `GEMINI_API_KEY`
+   - `SESSION_SECRET`
+   - `NODE_ENV=production`
+5. **Deploy** - Render will automatically build and deploy your Docker container
+
+#### Deploying to Railway
+
+1. **Create a new project** on [Railway](https://railway.app)
+2. **Deploy from GitHub repository**
+3. **Add environment variables** in the Railway dashboard:
+   - `OPENAI_API_KEY`
+   - `GEMINI_API_KEY`
+   - `SESSION_SECRET`
+   - `NODE_ENV=production`
+4. **Railway automatically detects the Dockerfile** and deploys
+
+#### Deploying to DigitalOcean App Platform
+
+1. **Create a new App** on [DigitalOcean](https://cloud.digitalocean.com/apps)
+2. **Connect your GitHub repository**
+3. **Configure the app**:
+   - **Resource Type**: Web Service
+   - **Build Type**: Dockerfile
+   - **Dockerfile Path**: `Dockerfile`
+   - **HTTP Port**: 3001
+4. **Add environment variables**:
+   - `OPENAI_API_KEY`
+   - `GEMINI_API_KEY`
+   - `SESSION_SECRET`
+   - `NODE_ENV=production`
+5. **Deploy** - DigitalOcean will build and deploy your container
+
+### Docker Image Details
+
+The Dockerfile uses a multi-stage build:
+
+1. **Stage 1**: Builds the React frontend using Vite
+2. **Stage 2**: Sets up the Node.js backend and copies the built frontend to the `public` directory
+
+In production mode:
+- The backend serves the frontend static files from `/app/public`
+- All API routes are prefixed with `/api`
+- Frontend requests use relative URLs (e.g., `/api/resume`)
+- A single port (3001) handles both frontend and backend
+
+### Security Best Practices
+
+1. **Never commit `.env` files** - They are git-ignored for security
+2. **Generate secure session secrets**: Use a random string generator
+   ```bash
+   openssl rand -base64 32
+   ```
+3. **Use environment variables** for all secrets - Never hardcode them
+4. **Rotate API keys regularly** - Update them in your deployment platform
+5. **Use HTTPS in production** - Most platforms provide this automatically
+
+
 ## AI Provider Fallback System
 
 HireMind includes an intelligent AI provider fallback system that automatically switches to alternative AI providers when the primary provider is unavailable or exceeds quota limits.
