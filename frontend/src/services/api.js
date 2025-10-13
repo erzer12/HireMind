@@ -6,6 +6,8 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
 
 /**
  * Helper function to handle fetch errors with better error messages
+ * @param {Error} error - The error to handle
+ * @throws {Error} Always throws either a new error or re-throws the original
  */
 const handleFetchError = (error) => {
   if (error.message.includes('Failed to fetch') || error.name === 'TypeError') {
