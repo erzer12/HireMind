@@ -1,407 +1,17 @@
 # HireMind
 
-🧠 **HireMind** is an AI-powered full-stack web application that helps users create professional resumes, cover letters, and portfolio webpages using advanced language models.
+🧠 **HireMind** is an AI-powered full-stack web application that helps users create professional resumes, cover letters, and portfolio webpages using advanced language models (OpenAI GPT & Google Gemini).
 
-## Features
-
-- 📝 **Resume Generator**: Create ATS-friendly professional resumes based on your experience and skills
-  - **Multiple Templates**: Choose from modern, classic, or minimal designs with visual card-based selection
-  - **Job Description Upload**: Upload or paste job descriptions (PDF, DOCX, TXT) for targeted resume creation
-  - **Resume Upload & AI Parsing**: Upload existing resumes (PDF, DOCX, TXT) and automatically extract structured data using AI
-  - **Session-Based Storage**: Uploaded resume data persists in session for easy reuse across multiple comparisons
-  - **AI-Powered Tailoring**: Generate resumes tailored to specific job descriptions with keyword optimization
-  - **Smart Suggestions**: Get AI recommendations for missing skills, keywords, and improvements based on actual resume content
-  - **Resume Comparison**: Compare your resume against job descriptions with match scoring using real parsed data
-  - **HTML Export**: Download resumes as formatted HTML files
-  - **PDF Export**: Print directly to PDF from browser
-  - **Template Customization**: Easy to add new templates
-- 💼 **Cover Letter Generator**: Generate tailored cover letters for specific job applications
-- 🌐 **Portfolio Generator**: Build a beautiful HTML portfolio webpage showcasing your projects
-- 🤖 **AI-Powered**: Leverages OpenAI's GPT models for intelligent content generation
-- 🔄 **AI Provider Fallback**: Automatic fallback to alternative AI providers (Gemini) when OpenAI quota is exceeded
-- 🎨 **Modern UI**: Clean and intuitive React-based user interface with enhanced template selection
-- 📥 **Export Options**: Copy to clipboard or download generated content
-
-## Tech Stack
-
-### Backend
-- **Node.js** with Express.js
-- **OpenAI API** for AI-powered content generation (Primary)
-- **Google Gemini API** for AI fallback support (Optional)
-- RESTful API architecture
-- CORS enabled for cross-origin requests
-
-### Frontend
-- **React** with Vite
-- Modern component-based architecture
-- Responsive design
-- Interactive forms with real-time validation
-
-## Project Structure
-
-```
-HireMind/
-├── backend/                 # Backend API server
-│   ├── src/
-│   │   ├── controllers/    # Request handlers
-│   │   ├── routes/         # API routes
-│   │   ├── services/       # Business logic (AI service)
-│   │   ├── templates/      # Resume templates (HTML/CSS)
-│   │   ├── middleware/     # Express middleware
-│   │   └── server.js       # Entry point
-│   ├── package.json
-│   └── .env.example
-│
-├── frontend/               # React frontend
-│   ├── src/
-│   │   ├── components/    # React components
-│   │   ├── services/      # API client
-│   │   ├── App.jsx        # Main app component
-│   │   └── main.jsx       # Entry point
-│   ├── package.json
-│   └── .env.example
-│
-└── README.md
-```
-
-## Setup Instructions
+## Quick Start (Local Development)
 
 ### Prerequisites
 - Node.js (v20 or higher)
 - npm or yarn
-- OpenAI API key ([Get one here](https://platform.openai.com/api-keys))
+- At least one AI provider API key:
+  - [OpenAI API key](https://platform.openai.com/api-keys)
+  - [Google Gemini API key](https://aistudio.google.com/app/apikey) (optional, for fallback)
 
-### Backend Setup
-
-1. Navigate to the backend directory:
-   ```bash
-   cd backend
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Create a `.env` file from the example:
-   ```bash
-   cp .env.example .env
-   ```
-   
-   **Important:** The `.env.example` file is only a template. You must create your own `.env` file for the application to work. The `.env` file is git-ignored for security and should never be committed to version control.
-
-4. Configure your `.env` file with your AI API keys:
-   ```env
-   PORT=3001
-   NODE_ENV=development
-   
-   # Primary AI Provider (OpenAI)
-   OPENAI_API_KEY=your_openai_api_key_here
-   OPENAI_MODEL=gpt-3.5-turbo
-   
-   # Fallback AI Provider (Gemini) - Optional but recommended
-   GEMINI_API_KEY=your_gemini_api_key_here
-   GEMINI_MODEL=gemini-1.5-flash
-   
-   # AI Provider Priority (optional, default: openai,gemini)
-   # AI_PROVIDER_PRIORITY=openai,gemini
-   ```
-   
-   **Note:** 
-   - Replace `your_openai_api_key_here` with your actual OpenAI API key from https://platform.openai.com/api-keys
-   - Replace `your_gemini_api_key_here` with your actual Gemini API key from https://aistudio.google.com/app/apikey
-   - You need at least one AI provider configured for the app to work
-   - Configure multiple providers for automatic fallback when one provider is unavailable or exceeds quota
-
-5. Start the backend server:
-   ```bash
-   npm run dev
-   ```
-
-   The API will be available at `http://localhost:3001`
-
-### Frontend Setup
-
-1. Navigate to the frontend directory:
-   ```bash
-   cd frontend
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Create a `.env` file from the example (optional - defaults are provided):
-   ```bash
-   cp .env.example .env
-   ```
-
-4. Start the development server:
-   ```bash
-   npm run dev
-   ```
-
-   The app will be available at `http://localhost:5173`
-
-## Usage
-
-1. **Start Both Servers**: Ensure both backend (port 3001) and frontend (port 5173) are running
-2. **Open the App**: Navigate to `http://localhost:5173` in your browser
-3. **Choose a Feature**: Select Resume, Cover Letter, or Portfolio from the navigation tabs
-4. **For Resume Creation**:
-   - **Select Template**: Choose from Modern Professional, Classic ATS, or Minimal Sidebar using the visual card selector
-   - **Upload Existing Resume (Optional)**: Upload your current resume (PDF, DOCX, TXT) to automatically extract and parse information using AI. The system will:
-     - Extract text from your resume file
-     - Use AI to parse the text into structured data (name, email, skills, experience, education)
-     - Store the parsed data in your session for easy reuse
-     - Optionally populate the form fields with extracted data
-     - Use the uploaded resume data for all subsequent job comparisons
-   - **Add Job Description (Optional)**: Paste or upload a job description for AI-powered tailoring
-   - **Analyze Job Description**: Click "Analyze JD" to extract required skills and keywords
-   - **Compare Resume**: Click "Compare Resume" to get AI suggestions and match scoring based on your uploaded resume or form data
-   - **Fill the Form**: Enter or review your information in the provided fields (auto-populated if resume uploaded)
-   - **Generate**: Click the generate button - if a job description is provided, you'll get a tailored resume
-5. **Review AI Suggestions**: Review missing skills, keyword recommendations, and improvement suggestions based on actual resume content
-6. **Export**: Copy to clipboard, download as HTML, or print to PDF
-
-### Resume Templates
-
-HireMind offers three professional resume templates:
-
-- **Modern Professional**: Contemporary design with gradient header - perfect for tech and creative roles (ATS Score: 9/10) ⭐
-- **Classic ATS**: Traditional black and white layout optimized for Applicant Tracking Systems (ATS Score: 10/10) ⭐
-- **Minimal Sidebar**: Clean two-column design with dark sidebar (ATS Score: 8/10)
-
-## Testing
-
-### Running Tests
-
-The backend includes comprehensive tests for JSON repair and resume data validation:
-
-```bash
-cd backend
-npm test
-```
-
-### Manual Testing
-
-The application can be tested manually by:
-1. Starting both backend and frontend servers
-2. Using the sample test files available in `docs/samples/`:
-   - [Sample Resume](docs/samples/sample_resume.txt) - Complete resume example
-   - [Sample Job Description](docs/samples/sample_job_description.txt) - Job description for testing comparisons
-
-Test the following features:
-- Upload and parse resume files (PDF, DOCX, TXT)
-- Verify structured data extraction (name, email, skills, experience, education)
-- Compare uploaded resume with job description
-- Test form field population from uploaded resume
-- Validate error handling for invalid files
-
-## API Endpoints
-
-### Health Check
-- **GET** `/api/health` - Check API status
-
-### Resume
-- **POST** `/api/resume` - Generate a resume
-  ```json
-  {
-    "template": "modern",
-    "name": "John Doe",
-    "email": "john@example.com",
-    "phone": "123-456-7890",
-    "location": "New York, NY",
-    "summary": "Experienced software developer...",
-    "skills": ["JavaScript", "React", "Node.js"],
-    "experience": [
-      {
-        "position": "Senior Developer",
-        "company": "Tech Corp",
-        "duration": "2020-Present",
-        "description": "Led development of..."
-      }
-    ],
-    "education": [
-      {
-        "degree": "BS Computer Science",
-        "institution": "University Name",
-        "year": "2019"
-      }
-    ]
-  }
-  ```
-
-- **GET** `/api/resume/templates` - Get available resume templates
-  ```json
-  {
-    "success": true,
-    "data": {
-      "templates": [
-        {
-          "id": "modern",
-          "name": "Modern Professional",
-          "description": "A modern resume with gradient header...",
-          "atsScore": 9,
-          "recommended": true
-        }
-      ]
-    }
-  }
-  ```
-
-- **POST** `/api/resume/tailored` - Generate a tailored resume based on job description
-  ```json
-  {
-    "template": "modern",
-    "jobDescription": "We are seeking a senior developer...",
-    "name": "John Doe",
-    "email": "john@example.com",
-    ...
-  }
-  ```
-
-- **POST** `/api/resume/parse` - Parse uploaded resume file
-  - Content-Type: `multipart/form-data`
-  - Field: `file` (PDF, DOCX, or TXT)
-  - Uses AI to extract structured data (name, email, skills, experience, education)
-  - Stores parsed data in user session for subsequent comparisons
-  - Returns: Structured resume data with metadata
-
-- **GET** `/api/resume/session` - Get uploaded resume data from session
-  - Returns currently stored resume data if available
-  - Used to check if user has an active uploaded resume
-
-- **DELETE** `/api/resume/session` - Clear uploaded resume data from session
-  - Removes stored resume data
-  - Called when user wants to upload a different resume
-
-- **POST** `/api/resume/analyze-jd` - Analyze job description
-  - Option 1: JSON body with `jobDescription` field
-  - Option 2: multipart/form-data with `file` field
-  - Returns: required skills, preferred skills, keywords, experience level
-
-- **POST** `/api/resume/compare` - Compare resume with job description
-  ```json
-  {
-    "resumeData": {
-      "name": "John Doe",
-      "skills": ["JavaScript", "React"],
-      ...
-    },
-    "jobDescription": "We are seeking..."
-  }
-  ```
-  - Returns: match score, missing skills, suggestions, improvements
-
-### Cover Letter
-- **POST** `/api/cover-letter` - Generate a cover letter
-  ```json
-  {
-    "userInfo": {
-      "name": "John Doe",
-      "email": "john@example.com",
-      "summary": "Experienced developer...",
-      "skills": ["JavaScript", "React"]
-    },
-    "jobInfo": {
-      "position": "Senior Developer",
-      "company": "Tech Corp",
-      "description": "We are looking for..."
-    }
-  }
-  ```
-
-### Portfolio
-- **POST** `/api/portfolio` - Generate a portfolio webpage
-  ```json
-  {
-    "name": "John Doe",
-    "title": "Full Stack Developer",
-    "bio": "Passionate developer...",
-    "skills": ["JavaScript", "React", "Node.js"],
-    "projects": [
-      {
-        "name": "Project Name",
-        "description": "Project description...",
-        "technologies": "React, Node.js",
-        "link": "https://github.com/user/project"
-      }
-    ]
-  }
-  ```
-
-## Configuration
-
-### Environment Variables Setup
-
-**Important:** This project uses `.env` files to manage environment variables. The `.env.example` files in both `backend/` and `frontend/` directories are **templates only** and are not loaded by the application. You must create your own `.env` files from these templates.
-
-### Backend Environment Variables
-
-Create a `.env` file in the `backend/` directory with the following variables:
-
-| Variable | Description | Default | Required |
-|----------|-------------|---------|----------|
-| `PORT` | Server port | 3001 | No |
-| `NODE_ENV` | Environment (development/production) | development | No |
-| `OPENAI_API_KEY` | Your OpenAI API key (Primary Provider) | - | At least one AI provider required |
-| `OPENAI_MODEL` | GPT model to use | gpt-3.5-turbo | No |
-| `GEMINI_API_KEY` | Your Google Gemini API key (Fallback Provider) | - | Optional (recommended) |
-| `GEMINI_MODEL` | Gemini model to use | gemini-1.5-flash | No |
-| `AI_PROVIDER_PRIORITY` | Comma-separated list of provider priority | openai,gemini | No |
-
-**Note:** 
-- You must configure at least one AI provider (OpenAI or Gemini) for the app to work.
-- Configure multiple AI providers for automatic fallback when quota is exceeded or a provider is unavailable.
-- The system will try providers in the order specified by `AI_PROVIDER_PRIORITY` (default: openai → gemini).
-- Get OpenAI API keys from https://platform.openai.com/api-keys
-- Get Gemini API keys from https://aistudio.google.com/app/apikey
-- Environment variables are loaded using the `-r dotenv/config` flag when starting the server, ensuring they're available before any application code runs.
-- The `.env` file is git-ignored and should never be committed to version control.
-
-### Frontend Environment Variables
-
-Create a `.env` file in the `frontend/` directory (optional - defaults are provided):
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `VITE_API_URL` | Backend API URL | http://localhost:3001/api |
-
-## Development
-
-### Backend Development
-```bash
-cd backend
-npm run dev  # Starts server with auto-reload
-```
-
-### Frontend Development
-```bash
-cd frontend
-npm run dev  # Starts Vite dev server with HMR
-```
-
-### Building for Production
-
-#### Backend
-The backend runs directly with Node.js - no build step required.
-
-#### Frontend
-```bash
-cd frontend
-npm run build  # Creates optimized production build in dist/
-npm run preview  # Preview production build locally
-```
-
-## Docker Deployment
-
-HireMind includes Docker support for easy, portable deployment to any platform that supports Docker containers.
-
-### Quick Start with Docker
-
-#### Using Docker Compose (Recommended)
+### Setup and Run
 
 1. **Clone the repository**:
    ```bash
@@ -409,155 +19,256 @@ HireMind includes Docker support for easy, portable deployment to any platform t
    cd HireMind
    ```
 
-2. **Create your environment file**:
+2. **Backend Setup**:
    ```bash
+   cd backend
+   npm install
+   cp .env.example .env
+   # Edit .env and add your API keys (OPENAI_API_KEY and/or GEMINI_API_KEY)
+   npm run dev
+   ```
+   Backend runs at `http://localhost:3001`
+
+3. **Frontend Setup** (in a new terminal):
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
+   Frontend runs at `http://localhost:5173`
+
+4. **Open the app**: Navigate to `http://localhost:5173` in your browser
+
+### Essential Environment Variables
+
+Create a `.env` file in the `backend/` directory:
+```env
+# At least one AI provider is required
+OPENAI_API_KEY=your_openai_api_key_here
+OPENAI_MODEL=gpt-3.5-turbo
+
+# Optional: Fallback provider (recommended for reliability)
+GEMINI_API_KEY=your_gemini_api_key_here
+GEMINI_MODEL=gemini-1.5-flash
+
+# Optional: Session secret for production
+SESSION_SECRET=your-secure-random-string
+```
+
+## Production Deployment
+
+### Docker Deployment (Recommended)
+
+#### Using Docker Compose
+
+1. **Clone and configure**:
+   ```bash
+   git clone https://github.com/erzer12/HireMind.git
+   cd HireMind
    cp .env.docker .env
+   # Edit .env and add your API keys
    ```
 
-3. **Edit `.env` and add your API keys**:
-   ```env
-   OPENAI_API_KEY=your_openai_api_key_here
-   GEMINI_API_KEY=your_gemini_api_key_here
-   SESSION_SECRET=your-secure-random-string
-   ```
-
-4. **Build and start the application**:
+2. **Build and run**:
    ```bash
    docker-compose up -d
    ```
 
-5. **Access the application**:
-   Open your browser and navigate to `http://localhost:3001`
+3. **Access the app**: `http://localhost:3001`
 
 #### Using Docker CLI
 
-1. **Build the Docker image**:
-   ```bash
-   docker build -t hiremind .
-   ```
-
-2. **Run the container** with environment variables:
-   ```bash
-   docker run -d \
-     -p 3001:3001 \
-     -e OPENAI_API_KEY=your_openai_api_key_here \
-     -e GEMINI_API_KEY=your_gemini_api_key_here \
-     -e SESSION_SECRET=your-secure-random-string \
-     -e NODE_ENV=production \
-     --name hiremind \
-     hiremind
-   ```
-
-3. **Access the application**:
-   Open your browser and navigate to `http://localhost:3001`
-
-### Environment Variables for Docker
-
-The following environment variables can be set at runtime:
-
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `PORT` | No | 3001 | Port the server listens on |
-| `NODE_ENV` | No | production | Environment mode |
-| `SESSION_SECRET` | Yes | - | Secret for session encryption (generate a secure random string) |
-| `OPENAI_API_KEY` | Yes* | - | OpenAI API key for GPT models |
-| `OPENAI_MODEL` | No | gpt-3.5-turbo | OpenAI model to use |
-| `GEMINI_API_KEY` | Yes* | - | Google Gemini API key for fallback |
-| `GEMINI_MODEL` | No | gemini-2.5-flash | Gemini model to use |
-| `AI_PROVIDER_PRIORITY` | No | openai,gemini | Comma-separated provider priority |
-| `FRONTEND_URL` | No | http://localhost:3001 | CORS allowed origin |
-
-\* At least one AI provider API key (OpenAI or Gemini) is required
-
-### Docker Management Commands
-
 ```bash
-# View logs
-docker-compose logs -f
-
-# Stop the application
-docker-compose down
-
-# Restart the application
-docker-compose restart
-
-# Rebuild after code changes
-docker-compose up -d --build
-
-# Check health status
-curl http://localhost:3001/api/health
+docker build -t hiremind .
+docker run -d \
+  -p 3001:3001 \
+  -e OPENAI_API_KEY=your_key \
+  -e GEMINI_API_KEY=your_key \
+  -e SESSION_SECRET=your_secret \
+  -e NODE_ENV=production \
+  --name hiremind \
+  hiremind
 ```
 
-### Platform-Specific Deployment
+### Platform Deployment (Render, Railway, DigitalOcean)
 
-#### Deploying to Render
-
-1. **Create a new Web Service** on [Render](https://render.com)
-2. **Connect your GitHub repository**
-3. **Configure the service**:
-   - **Environment**: Docker
-   - **Dockerfile Path**: `Dockerfile`
-   - **Port**: 3001
-4. **Add environment variables** in the Render dashboard:
-   - `OPENAI_API_KEY`
-   - `GEMINI_API_KEY`
-   - `SESSION_SECRET`
+1. **Connect your GitHub repository** to the platform
+2. **Configure as Docker deployment** with `Dockerfile`
+3. **Set environment variables**:
+   - `OPENAI_API_KEY` (required)
+   - `GEMINI_API_KEY` (recommended)
+   - `SESSION_SECRET` (required for production)
    - `NODE_ENV=production`
-5. **Deploy** - Render will automatically build and deploy your Docker container
+4. **Deploy** - The platform builds and serves both frontend and backend on port 3001
 
-#### Deploying to Railway
+**Note**: In production, the backend serves the frontend at the root URL (`/`), and all API endpoints are under `/api/*`.
 
-1. **Create a new project** on [Railway](https://railway.app)
-2. **Deploy from GitHub repository**
-3. **Add environment variables** in the Railway dashboard:
-   - `OPENAI_API_KEY`
-   - `GEMINI_API_KEY`
-   - `SESSION_SECRET`
-   - `NODE_ENV=production`
-4. **Railway automatically detects the Dockerfile** and deploys
+## Project Structure
 
-#### Deploying to DigitalOcean App Platform
+```
+HireMind/
+├── backend/                 # Backend API server (Express.js)
+│   ├── src/
+│   │   ├── controllers/    # Request handlers
+│   │   ├── routes/         # API routes
+│   │   ├── services/       # Business logic (AI service)
+│   │   ├── templates/      # Resume templates (HTML/CSS)
+│   │   ├── middleware/     # Express middleware
+│   │   └── server.js       # Entry point
+│   └── tests/              # Backend tests
+├── frontend/               # React frontend (Vite)
+│   └── src/
+│       ├── components/     # React components
+│       ├── services/       # API client
+│       └── App.jsx         # Main app component
+├── Dockerfile              # Multi-stage Docker build
+└── docker-compose.yml      # Docker Compose configuration
+```
 
-1. **Create a new App** on [DigitalOcean](https://cloud.digitalocean.com/apps)
-2. **Connect your GitHub repository**
-3. **Configure the app**:
-   - **Resource Type**: Web Service
-   - **Build Type**: Dockerfile
-   - **Dockerfile Path**: `Dockerfile`
-   - **HTTP Port**: 3001
-4. **Add environment variables**:
-   - `OPENAI_API_KEY`
-   - `GEMINI_API_KEY`
-   - `SESSION_SECRET`
-   - `NODE_ENV=production`
-5. **Deploy** - DigitalOcean will build and deploy your container
+## Features
 
-### Docker Image Details
+- 📝 **Resume Generator**: 
+  - 3 professional templates (Modern, Classic ATS, Minimal)
+  - Upload & AI-parse existing resumes (PDF, DOCX, TXT)
+  - AI-powered tailoring to job descriptions
+  - Resume comparison with match scoring
+  - HTML/PDF export
+- 💼 **Cover Letter Generator**: Tailored cover letters for specific jobs
+- 🌐 **Portfolio Generator**: Beautiful HTML portfolio webpages
+- 🤖 **AI-Powered**: OpenAI GPT with automatic Gemini fallback
+- 🎨 **Modern React UI**: Clean, responsive interface
 
-The Dockerfile uses a multi-stage build:
+## API Endpoints
 
-1. **Stage 1**: Builds the React frontend using Vite
-2. **Stage 2**: Sets up the Node.js backend and copies the built frontend to the `public` directory
+### Core Endpoints
+- `GET /api/health` - API health check
+- `POST /api/resume` - Generate resume
+- `POST /api/resume/tailored` - Generate job-tailored resume
+- `POST /api/resume/parse` - Parse uploaded resume with AI
+- `POST /api/resume/compare` - Compare resume vs job description
+- `POST /api/cover-letter` - Generate cover letter
+- `POST /api/portfolio` - Generate portfolio webpage
 
-In production mode:
-- The backend serves the frontend static files from `/app/public`
-- All API routes are prefixed with `/api`
-- Frontend requests use relative URLs (e.g., `/api/resume`)
-- A single port (3001) handles both frontend and backend
+**Full API documentation**: See [detailed API section](#detailed-api-documentation) below.
 
-### Security Best Practices
+## Troubleshooting
 
-1. **Never commit `.env` files** - They are git-ignored for security
-2. **Generate secure session secrets**: Use a random string generator
-   ```bash
-   openssl rand -base64 32
-   ```
-3. **Use environment variables** for all secrets - Never hardcode them
-4. **Rotate API keys regularly** - Update them in your deployment platform
-5. **Use HTTPS in production** - Most platforms provide this automatically
+### Common Issues
 
+**Backend not responding**:
+- Ensure backend is running: `cd backend && npm run dev`
+- Check if port 3001 is available
+- Visit http://localhost:3001/api/health to verify
 
-## AI Provider Fallback System
+**"No AI provider API keys configured"**:
+- Create `.env` file in `backend/` directory (not `.env.example`)
+- Add at least one AI provider key (OPENAI_API_KEY or GEMINI_API_KEY)
+- Restart the backend server
+
+**"Failed to fetch" errors**:
+- Backend must be running before frontend
+- Check that VITE_API_URL in frontend/.env points to backend
+- Look for CORS errors in browser console
+
+**Port conflicts**:
+- Change ports in `.env` files if 3001 or 5173 are in use
+- Update `VITE_API_URL` if backend port changes
+
+See [detailed troubleshooting](#detailed-troubleshooting) below for more help.
+
+---
+
+## Advanced Topics
+
+### Detailed API Documentation
+
+#### Health Check
+- **GET** `/api/health` - Check API status
+
+#### Resume Endpoints
+
+**POST** `/api/resume` - Generate a resume
+```json
+{
+  "template": "modern",
+  "name": "John Doe",
+  "email": "john@example.com",
+  "phone": "123-456-7890",
+  "location": "New York, NY",
+  "summary": "Experienced software developer...",
+  "skills": ["JavaScript", "React", "Node.js"],
+  "experience": [
+    {
+      "position": "Senior Developer",
+      "company": "Tech Corp",
+      "duration": "2020-Present",
+      "description": "Led development of..."
+    }
+  ],
+  "education": [
+    {
+      "degree": "BS Computer Science",
+      "institution": "University Name",
+      "year": "2019"
+    }
+  ]
+}
+```
+
+**GET** `/api/resume/templates` - Get available resume templates
+
+**POST** `/api/resume/tailored` - Generate a tailored resume based on job description
+
+**POST** `/api/resume/parse` - Parse uploaded resume file (multipart/form-data)
+
+**GET** `/api/resume/session` - Get uploaded resume data from session
+
+**DELETE** `/api/resume/session` - Clear uploaded resume data from session
+
+**POST** `/api/resume/analyze-jd` - Analyze job description
+
+**POST** `/api/resume/compare` - Compare resume with job description
+
+#### Cover Letter Endpoint
+
+**POST** `/api/cover-letter` - Generate a cover letter
+```json
+{
+  "userInfo": {
+    "name": "John Doe",
+    "email": "john@example.com",
+    "summary": "Experienced developer...",
+    "skills": ["JavaScript", "React"]
+  },
+  "jobInfo": {
+    "position": "Senior Developer",
+    "company": "Tech Corp",
+    "description": "We are looking for..."
+  }
+}
+```
+
+#### Portfolio Endpoint
+
+**POST** `/api/portfolio` - Generate a portfolio webpage
+```json
+{
+  "name": "John Doe",
+  "title": "Full Stack Developer",
+  "bio": "Passionate developer...",
+  "skills": ["JavaScript", "React", "Node.js"],
+  "projects": [
+    {
+      "name": "Project Name",
+      "description": "Project description...",
+      "technologies": "React, Node.js",
+      "link": "https://github.com/user/project"
+    }
+  ]
+}
+```
+
+### AI Provider Fallback System
 
 HireMind includes an intelligent AI provider fallback system that automatically switches to alternative AI providers when the primary provider is unavailable or exceeds quota limits.
 
@@ -618,7 +329,7 @@ The system automatically retries with the next provider for:
 ✅ Successfully generated text with Gemini
 ```
 
-## Troubleshooting
+### Detailed Troubleshooting
 
 ### "No AI provider API keys configured"
 This warning appears when neither `OPENAI_API_KEY` nor `GEMINI_API_KEY` is set in your environment variables.
@@ -666,7 +377,7 @@ This error indicates that the frontend cannot connect to the backend API server.
 
 #### Quick Checklist
 - [ ] Is the backend server running? (Check terminal for "🚀 HireMind API server running")
-- [ ] Is the backend accessible at http://localhost:3001? (Open in browser - should see "HireMind API Running")
+- [ ] Is the backend accessible at http://localhost:3001/api/health? (Should return JSON with status "OK")
 - [ ] Is the frontend configured with the correct API URL?
 - [ ] Are both frontend and backend running on expected ports?
 
@@ -685,10 +396,9 @@ This error indicates that the frontend cannot connect to the backend API server.
    ```
 
 2. **Test Backend Connection**
-   - Open http://localhost:3001 in your browser
-   - You should see: "HireMind API Running"
    - Try the health check: http://localhost:3001/api/health
    - Should return: `{"status":"OK","message":"HireMind API is running"}`
+   - Note: In development mode, http://localhost:3001 shows "HireMind API Running"; in production it serves the frontend
 
 3. **Check Browser Network Tab**
    - Open browser DevTools (F12)
@@ -719,10 +429,6 @@ This error indicates that the frontend cannot connect to the backend API server.
 - Try a different port by setting `PORT=3002` in `backend/.env`
 - Clear browser cache and restart dev servers
 - Check for conflicting processes: `lsof -i :3001` (Mac/Linux) or `netstat -ano | findstr :3001` (Windows)
-
-### Port conflicts
-- If port 3001 or 5173 is in use, change the port in `.env` files
-- Update the frontend `VITE_API_URL` if you change the backend port
 
 ## Contributing
 

@@ -21,3 +21,6 @@ Thumbs.db
 *.swp
 *.swo
 test_*.js
+
+# Built frontend (generated during Docker build)
+public/
