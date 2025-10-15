@@ -34,11 +34,7 @@ app.use(session({
   }
 }));
 
-// Routes
-app.get('/', (req, res) => {
-  res.send('HireMind API Running');
-});
-
+// API Routes
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'HireMind API is running' });
 });
@@ -55,6 +51,11 @@ if (process.env.NODE_ENV === 'production') {
   // Serve index.html for all non-API routes (SPA support)
   app.get('*', (req, res) => {
     res.sendFile(path.join(publicPath, 'index.html'));
+  });
+} else {
+  // Development mode: Show API running message at root
+  app.get('/', (req, res) => {
+    res.send('HireMind API Running');
   });
 }
 
