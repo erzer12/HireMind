@@ -397,8 +397,11 @@ This error indicates that the frontend cannot connect to the backend API server.
 
 2. **Test Backend Connection**
    - Try the health check: http://localhost:3001/api/health
-   - Should return: `{"status":"OK","message":"HireMind API is running"}`
-   - Note: In development mode, http://localhost:3001 shows "HireMind API Running"; in production it serves the frontend
+   - Should return JSON: `{"status":"OK","message":"HireMind API is running"}`
+   - **Note on root URL behavior**:
+     - **Development mode** (`NODE_ENV=development`): `http://localhost:3001/` shows "HireMind API Running" text
+     - **Production mode** (`NODE_ENV=production`): `http://localhost:3001/` serves the React frontend HTML
+     - The `/api/*` endpoints work the same in both modes
 
 3. **Check Browser Network Tab**
    - Open browser DevTools (F12)
